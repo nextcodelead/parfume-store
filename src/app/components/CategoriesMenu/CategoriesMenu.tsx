@@ -58,7 +58,6 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
             </div>
           </div>
 
-          {/* Right Side - Subcategories */}
           {hoveredCategory && (
             <SubcategoriesPanel categoryId={hoveredCategory} onClose={onClose} />
           )}
