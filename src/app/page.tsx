@@ -2,7 +2,7 @@
 import React from 'react';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
-import CategoryCard from './components/CategoryCard';
+// import CategoryCard from './components/CategoryCard';
 import Header from './components/Header';
 
 interface Category {
@@ -132,14 +132,14 @@ const App: React.FC = () => {
         {/* Promotion */}
         
         {/* Catalog Categories */}
-        <section id="catalog" className="mb-16">
+        {/* <section id="catalog" className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Покупка по категориям</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {CATEGORIES.map(category => (
               <CategoryCard key={category.id} category={category} />
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* Hit Products */}
         <section id="sale" className="mb-16">

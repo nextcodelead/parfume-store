@@ -3,7 +3,7 @@ import { Tag, Package, Gift, ArrowRight } from "lucide-react";
 import  Button  from "../Button";
 import { SHIPPING_OPTIONS } from "../../data/shippingOptions";
 import { CartItemType } from "../../data/cartProductsData";
-
+import Link from "next/link";
 type CartSummaryProps = {
   items: CartItemType[];
 };
@@ -98,7 +98,9 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
       </div>
 
       <Button variant="primary" size="lg" fullWidth rightIcon={<ArrowRight size={20} />}>
+      <Link href="/checkout" className="flex items-center justify-center w-full">
         Перейти к оформлению заказа
+      </Link>
       </Button>
 
       <div className="mt-6 space-y-2 text-sm text-gray-600">
