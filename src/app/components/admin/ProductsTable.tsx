@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { Search, Plus, Eye, Edit, Trash2, Download } from 'lucide-react';
 import { Product } from '../../types/admin';
+import { ProductFormData } from '../../types/product';
 import { PRODUCTS_DATA } from '../../data/adminData';
 import Button from '../Button';
+import AddProductModal from './AddProductModal';
 
 const ProductsTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const handleAddProduct = (productData: ProductFormData) => {
+    console.log('New product:', productData);
+    // Здесь будет логика добавления продукта
+  };
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -32,7 +40,11 @@ const ProductsTable: React.FC = () => {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900">Товары</h2>
-          <Button variant="primary" leftIcon={<Plus size={20} />}>
+          <Button 
+            variant="primary" 
+            leftIcon={<Plus size={20} />}
+            onClick={() => setIsAddModalOpen(true)}
+          >
             Добавить товар
           </Button>
         </div>
@@ -132,6 +144,13 @@ const ProductsTable: React.FC = () => {
           <Button variant="outline" size="sm">Далее</Button>
         </div>
       </div>
+
+      {/* Add Product Modal */}
+      <AddProductModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={handleAddProduct}
+      />
     </div>
   );
 };

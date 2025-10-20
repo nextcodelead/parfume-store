@@ -60,15 +60,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }
               </div>
             </Link>
 
-            {/* Кнопка Каталога (Категории) */}
-            <button
-              onClick={() => setIsCategoriesOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors font-medium ml-4"
-            >
-              <Menu size={20} />
-              <span className="hidden md:inline">Каталог</span>
-            </button>
-
+          
             {/* Поиск */}
             <div className="hidden md:flex flex-1 max-w-xl mx-8">
               <div className="relative w-full">

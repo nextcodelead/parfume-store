@@ -24,7 +24,7 @@ export default function ProductPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header activeTab="cart" onTabChange={() => {}} />
+      <Header/>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-8 mb-12">

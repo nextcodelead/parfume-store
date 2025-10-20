@@ -4,13 +4,7 @@ import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 // import CategoryCard from './components/CategoryCard';
 import Header from './components/Header';
-
-interface Category {
-  id: number;
-  name: string;
-  image: string;
-  bgColor: string;
-}
+import GraphQLDemo from './components/GraphQLDemo';
 
 interface Product {
   id: number;
@@ -25,13 +19,13 @@ interface Product {
   isNew?: boolean;
 }
 
-// Categories
-const CATEGORIES: Category[] = [
-  { id: 1, name: "Женщинам", image: "🌹", bgColor: "bg-pink-100" },
-  { id: 2, name: "Мужчинам", image: "🌲", bgColor: "bg-blue-100" },
-  { id: 3, name: "Унисекс", image: "✨", bgColor: "bg-purple-100" },
-  { id: 4, name: "Люкс", image: "👑", bgColor: "bg-amber-100" }
-];
+// Categories (commented out as not currently used)
+// const CATEGORIES: Category[] = [
+//   { id: 1, name: "Женщинам", image: "🌹", bgColor: "bg-pink-100" },
+//   { id: 2, name: "Мужчинам", image: "🌲", bgColor: "bg-blue-100" },
+//   { id: 3, name: "Унисекс", image: "✨", bgColor: "bg-purple-100" },
+//   { id: 4, name: "Люкс", image: "👑", bgColor: "bg-amber-100" }
+// ];
 
 const SALE_PRODUCTS: Product[] = [
   { 
@@ -105,6 +99,9 @@ const App: React.FC = () => {
       {/* <Header /> */}
       <Header />
       <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* GraphQL Demo */}
+        <GraphQLDemo />
+        
         {/* Promo Products */}
         <section id="promo" className="mb-16">
           <div className="flex justify-between items-center mb-8">
