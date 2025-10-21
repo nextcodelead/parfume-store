@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Menu, X, ChevronRight } from 'lucide-react';
-import { CATEGORIES_DATA } from '../../data/categoriesData';
-import { Category } from '../../types/types';
+import { X, ChevronRight } from 'lucide-react';
+import { Category, Subcategory } from '../../types/graphql';
+import { useCategories } from '../../hooks/useCategories';
 
 interface CategoriesMenuProps {
   isOpen: boolean;
@@ -9,8 +9,12 @@ interface CategoriesMenuProps {
 }
 
 export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose }) => {
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
+  const { data, loading, error } = useCategories();
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading categories</div>;
+  const categories = data?.categories as Category[] ?? [];
   return (
     <>
       {/* Overlay */}
@@ -34,7 +38,7 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b bg-white">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-gray-900">All Categories</h2>
+                <h2 className="text-lg font-bold text-gray-900"> All Categories</h2>
               </div>
               <button
                 onClick={onClose}
@@ -46,11 +50,11 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
 
             {/* Categories List */}
             <div className="flex-1 overflow-y-auto">
-              {CATEGORIES_DATA.map((category) => (
+              {categories.map((category) => (
                 <CategoryItem
-                  key={category.id}
+                  key={category.pk}
                   category={category}
-                  isHovered={hoveredCategory === category.id}
+                  isHovered={hoveredCategory === category.pk}
                   onHover={setHoveredCategory}
                   onClick={onClose}
                 />
@@ -59,7 +63,7 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
           </div>
 
           {hoveredCategory && (
-            <SubcategoriesPanel categoryId={hoveredCategory} onClose={onClose} />
+            <SubcategoriesPanel subcategories={categories.find(cat => cat.pk === hoveredCategory)?.children} onClose={onClose} />
           )}
         </div>
       </div>
@@ -71,7 +75,7 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
 interface CategoryItemProps {
   category: Category;
   isHovered: boolean;
-  onHover: (id: string | null) => void;
+  onHover: (id: number | null) => void;
   onClick: () => void;
 }
 
@@ -82,9 +86,9 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
   onClick 
 }) => (
   <button
-    onMouseEnter={() => onHover(category.id)}
+    onMouseEnter={() => onHover(category.pk)}
     onClick={() => {
-      console.log('Navigate to:', category.id);
+      console.log('Navigate to:', category.pk);
       onClick();
     }}
     className={`w-full flex items-center justify-between p-4 transition-colors ${
@@ -94,8 +98,9 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     }`}
   >
     <div className="flex items-center gap-3">
-      <span className={`text-3xl p-2 rounded-lg ${category.color}`}>
-        {category.icon}
+      {/* <span className={`text-3xl p-2 rounded-lg ${category.color}`}> */}
+      <span className={`text-3xl p-2 rounded-lg red`}>
+        {category.iconUrl}
       </span>
       <span className="font-medium text-gray-900 text-left">
         {category.name}
@@ -112,33 +117,46 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
 
 // Компонент панели подкатегорий
 interface SubcategoriesPanelProps {
-  categoryId: string;
+  subcategories: Subcategory[];
   onClose: () => void;
 }
 
-const SubcategoriesPanel: React.FC<SubcategoriesPanelProps> = ({ categoryId, onClose }) => {
-  const category = CATEGORIES_DATA.find(cat => cat.id === categoryId);
-  
-  if (!category) return null;
+const SubcategoriesPanel: React.FC<SubcategoriesPanelProps> = ({ subcategories, onClose }) => {
+  if (!subcategories) return null;
+  const groupByGroupName: { [key: string]: { pk: number; name: string }[] } = {};
+  subcategories.forEach((subcat) => {
+    const groupName = subcat.groupName || 'Other';
+    if (!groupByGroupName[groupName]) {
+      groupByGroupName[groupName] = [];
+    }
+    groupByGroupName[groupName].push({
+      pk: subcat.pk,
+      name: subcat.name,
+    });
+  });
 
+  const subcategoriesFormatted = Object.entries(groupByGroupName).map(([groupName, items]) => ({
+    groupName,
+    items,
+  }));
   return (
     <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
-      {category.subcategories.map((subcat: { name: string; items: string[] }, idx: number) => (
+      {subcategoriesFormatted.map((subcat, idx) => (
         <div key={idx} className="mb-6">
           <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
-            {subcat.name}
+            {subcat.groupName}
           </h3>
           <div className="grid grid-cols-2 gap-2">
-            {subcat.items.map((item: string, itemIdx: number) => (
+            {subcat.items.map((item, itemIdx) => (
               <button
                 key={itemIdx}
                 onClick={() => {
-                  console.log('Navigate to:', item);
+                  console.log('Navigate to:', item.pk);
                   onClose();
                 }}
                 className="text-left px-3 py-2 text-sm text-gray-700 hover:text-rose-600 hover:bg-white rounded-lg transition-colors"
               >
-                {item}
+                {item.name}
               </button>
             ))}
           </div>

@@ -1,23 +1,13 @@
-
+'use client';
 import React from 'react';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 // import CategoryCard from './components/CategoryCard';
 import Header from './components/Header';
-import GraphQLDemo from './components/GraphQLDemo';
+import { useProductsByDiscount } from './hooks/useCategories';
+import { Product } from './types/graphql';
+// import GraphQLDemo from './components/GraphQLDemo';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  rating: number;
-  reviews: number;
-  category?: string;
-  oldPrice?: number;
-  discount?: number;
-  isNew?: boolean;
-}
 
 // Categories (commented out as not currently used)
 // const CATEGORIES: Category[] = [
@@ -94,24 +84,30 @@ const SECOND_PERFUME: Product[] = [
 
 
 const App: React.FC = () => {
+  const { data, productsWithDiscountLoading, error } = useProductsByDiscount();
+  const productsWithDiscount = data?.products as Product[] || [];
   return (
     <div className="min-h-screen bg-gray-50">
       {/* <Header /> */}
       <Header />
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* GraphQL Demo */}
-        <GraphQLDemo />
+        {/* <GraphQLDemo /> */}
         
         {/* Promo Products */}
         <section id="promo" className="mb-16">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Акции</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {SALE_PRODUCTS.map(product => (
-              <ProductCard key={product.id} product={product} showDiscount={true}  />
-            ))}
-          </div>
+          {productsWithDiscountLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {productsWithDiscount.map(product => (
+                <ProductCard key={product.id} product={product} showDiscount={true}  />
+              ))}
+            </div>
+          )}
         </section>
         
         {/* New Products */}

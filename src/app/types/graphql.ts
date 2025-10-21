@@ -3,19 +3,26 @@
 export interface Product {
   id: string;
   name: string;
-  price: number;
+  cost: number;
+  photoUrl: string;
+  discount: number;
   images: {
-    url: string;
+    imageUrl: string;
   }[];
   stocks: {
-    size: string;
     quantity: number;
   }[];
 }
 
 export interface Category {
-  uid: string;
+  pk: number;
+  iconUrl: string;
   name: string;
+  children?: Subcategory[];
+}
+
+export interface Subcategory extends Category {
+  groupName: string;
 }
 
 export interface Brand {
