@@ -74,7 +74,27 @@ export const GET_PRODUCTS = gql`
 `;
 
 
-
+export const GET_PRODUCTS_ADMIN = gql`
+  query byPromotion ($filters: ProductFilter, $pagination: PaginationInput) {
+    products(filters: $filters, pagination: $pagination) {
+      pk
+      name
+      category {
+        name
+      }
+      photoUrl
+      cost
+      count
+      countCells
+      status
+    }
+  }
+`;
+export const GET_PRODUCTS_COUNT_ADMIN = gql`
+  query byPromotion ($filters: ProductFilter) {
+    productsCount(filters: $filters)
+  }
+`;
 
 
 

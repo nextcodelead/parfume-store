@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client/react';
-import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS } from '../graphql/queries';
+import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS, GET_PRODUCTS_ADMIN, GET_PRODUCTS_COUNT_ADMIN } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
 
 // Хук для получения всех категорий
@@ -27,7 +27,10 @@ export const useProductsByDiscount = () => {
         "discount": {
           "equals": 0
         }
-      }  
+      },
+      pagination: {
+        limit: 4,
+      }
     },
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
@@ -35,6 +38,48 @@ export const useProductsByDiscount = () => {
   });
 };
 
+export const useAdminProducts = (name: string | null, page: number = 0) => {
+  const isClient = useIsClient();
+  let filters = null;
+  if (name) {
+    filters = {
+      "name": {
+        "contains": name
+      }
+    };
+  }
+  return useQuery(GET_PRODUCTS_ADMIN, {
+    variables: { 
+      filters: filters,
+      pagination: {
+        offset: page * 5,
+        limit: 5,
+      }
+    },
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    skip: !isClient,
+  });
+};
+export const useAdminProductsCount = (name: string | null) => {
+  const isClient = useIsClient();
+  let filters = null;
+  if (name) {
+    filters = {
+      "name": {
+        "contains": name
+      }
+    };
+  }
+  return useQuery(GET_PRODUCTS_COUNT_ADMIN, {
+    variables: { 
+      filters: filters,
+    },
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    skip: !isClient,
+  });
+};
 
 
 // Хук для получения всех брендов

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Search, Plus, Eye, Edit, Trash2, Download } from 'lucide-react';
 import { Product } from '../../types/admin';
@@ -5,11 +7,15 @@ import { ProductFormData } from '../../types/product';
 import { PRODUCTS_DATA } from '../../data/adminData';
 import Button from '../Button';
 import AddProductModal from './AddProductModal';
+import { useAdminProducts, useAdminProductsCount } from '@/app/hooks/useCategories';
 
 const ProductsTable: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const { data, loading, error } = useAdminProducts(searchTerm, currentPage);
+  const { data: dataProductsCount, loading: loadingProductsCount, error: errorProductsCount } = useAdminProductsCount(searchTerm);
 
   const handleAddProduct = (productData: ProductFormData) => {
     console.log('New product:', productData);
@@ -18,14 +24,14 @@ const ProductsTable: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      active: 'bg-green-100 text-green-700',
-      draft: 'bg-gray-100 text-gray-700',
-      outofstock: 'bg-red-100 text-red-700'
+      ACTIVE: 'bg-green-100 text-green-700',
+      DRAFT: 'bg-gray-100 text-gray-700',
+      OUT_OF_STOCK: 'bg-red-100 text-red-700'
     };
     const labels = {
       active: 'Активен',
       draft: 'Черновик',
-      outofstock: 'Нет в наличии'
+      OUT_OF_STOCK: 'Нет в наличии'
     };
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badges[status as keyof typeof badges]}`}>
@@ -92,27 +98,30 @@ const ProductsTable: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {PRODUCTS_DATA.map((product) => (
+            {loading && <tr><td colSpan={7} className="text-center py-4">Загрузка...</td></tr>}
+            {error && <tr><td colSpan={7} className="text-center py-4">Ошибка загрузки</td></tr>}
+            {data && data.products.map((product) => (
               <tr key={product.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                      {product.image}
+                      {/* {product.image} */}
+                      {product.photoUrl ? product.photoUrl : <span>🌹</span>}
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900">{product.name}</p>
-                      <p className="text-sm text-gray-600">ID: {product.id}</p>
+                      <p className="text-sm text-gray-600">ID: {product.pk}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-gray-700">{product.category}</td>
-                <td className="px-6 py-4 font-semibold text-gray-900">₽{product.price.toFixed(2)}</td>
+                <td className="px-6 py-4 text-gray-700">{product.category.name}</td>
+                <td className="px-6 py-4 font-semibold text-gray-900">₽{product.cost.toFixed(2)}</td>
                 <td className="px-6 py-4">
-                  <span className={`font-semibold ${product.stock === 0 ? 'text-red-600' : product.stock < 20 ? 'text-orange-600' : 'text-green-600'}`}>
-                    {product.stock}
+                  <span className={`font-semibold ${product.count === 0 ? 'text-red-600' : product.count < 20 ? 'text-orange-600' : 'text-green-600'}`}>
+                    {product.count}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-gray-700">{product.sales}</td>
+                <td className="px-6 py-4 text-gray-700">{product.countCells}</td>
                 <td className="px-6 py-4">{getStatusBadge(product.status)}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
@@ -135,13 +144,25 @@ const ProductsTable: React.FC = () => {
 
       {/* Pagination */}
       <div className="p-6 border-t border-gray-200 flex items-center justify-between">
-        <p className="text-sm text-gray-600">Показано 1-5 из 342 товаров</p>
+        {errorProductsCount && <p>Ошибка загрузки количества товаров</p>}
+
+        {/* безопасный рендер: либо есть числа — показываем корректно, иначе — нейтральный текст */}
+        {!loadingProductsCount && dataProductsCount?.productsCount != null ? (
+          <p className="text-sm text-gray-600">
+            Показано {currentPage * 5 + 1}-
+            {Math.min((currentPage + 1) * 5, dataProductsCount.productsCount)} из{" "}
+            {dataProductsCount.productsCount} товаров
+          </p>
+        ) : (
+          <p className="text-sm text-gray-600">Загрузка количества товаров…</p>
+        )}
+        
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">Назад</Button>
-          <Button variant="outline" size="sm">1</Button>
-          <Button variant="primary" size="sm">2</Button>
-          <Button variant="outline" size="sm">3</Button>
-          <Button variant="outline" size="sm">Далее</Button>
+          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}>Назад</Button>
+          <Button variant="primary" size="sm" onClick={() => setCurrentPage(0)}>1</Button>
+          <Button variant="outline" size="sm" onClick={() => setCurrentPage(1)}>2</Button>
+          <Button variant="outline" size="sm" onClick={() => setCurrentPage(2)}>3</Button>
+          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => prev + 1)}>Далее</Button>
         </div>
       </div>
 

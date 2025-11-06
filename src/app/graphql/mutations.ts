@@ -3,6 +3,14 @@ import { gql } from '@apollo/client';
 // GraphQL Mutations для парфюмерного магазина (обновлены под реальную схему)
 
 // Мутация для добавления продукта в корзину пользователя
+export const ADMIN_ADD_PRODUCT = gql`
+  mutation addProduct($input: ProductInput!) {
+    addProduct(input: $input) {
+      pk
+    }
+  }
+`;
+
 export const ADD_PRODUCT_TO_USER_CART = gql`
   mutation AddProductToUserCart($productId: ID!, $quantity: Int!) {
     addProductToUserCart(productId: $productId, quantity: $quantity) {
