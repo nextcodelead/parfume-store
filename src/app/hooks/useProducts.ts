@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useMutation, useQuery } from '@apollo/client/react';
 import { GET_PRODUCTS, GET_PRODUCT } from '../graphql/queries';
 import { ADMIN_ADD_PRODUCT } from '../graphql/mutations';
@@ -11,6 +12,11 @@ export interface ProductInput {
   volume: number,
   count: number
 }
+=======
+import { useQuery, useMutation } from '@apollo/client/react';
+import { GET_PRODUCTS, GET_PRODUCT } from '../graphql/queries';
+import { addProduct } from '../graphql/mutations';
+>>>>>>> 3d5ef32 (some changes)
 
 // Хук для получения списка продуктов
 export const useProducts = () => {
@@ -30,9 +36,15 @@ export const useProduct = (pk: number) => {
   });
 };
 
+<<<<<<< HEAD
 export const useAddProduct = (input: ProductInput) => {
   return useMutation(ADMIN_ADD_PRODUCT, {
     variables: { input },
     errorPolicy: 'all',
   });
 };
+=======
+export const useAdd = () => {
+  return useMutation(addProduct)
+}
+>>>>>>> 3d5ef32 (some changes)

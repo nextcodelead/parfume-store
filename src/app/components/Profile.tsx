@@ -17,7 +17,7 @@ export default function Profile() {
   });
 
   const user = data?.me;
-
+  
   React.useEffect(() => {
     if (user && !isEditing) {
       setFormData({

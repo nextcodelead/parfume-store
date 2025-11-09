@@ -1,17 +1,19 @@
 // GraphQL типы для парфюмерного магазина
 
 export interface Product {
-  id: string;
+  pk: number;  // ← использовать pk вместо id
   name: string;
-  cost: number;
-  photoUrl: string;
-  discount: number;
-  images: {
-    imageUrl: string;
-  }[];
-  stocks: {
-    quantity: number;
-  }[];
+  cost: number; // ← использовать cost вместо price
+  discount?: number;
+  photoUrl?: string;
+  description?: string;
+  isPublished?: boolean;
+  // Дополнительные поля если нужны
+  rating?: number;
+  reviews?: number;
+  category?: string;
+  isNew?: boolean;
+  oldPrice?: number; // для отображения старой цены
 }
 
 export interface Category {

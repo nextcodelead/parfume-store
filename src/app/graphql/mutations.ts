@@ -47,7 +47,7 @@ export const CREATE_ORDER = gql`
           quantity
           price
           product {
-            id
+            pk
             name
             price
             image
@@ -58,6 +58,14 @@ export const CREATE_ORDER = gql`
   }
 `;
 
+export const addProduct = gql`
+  mutation($input: ProductInput!) {
+  addProduct(input: $input) {
+    pk
+  }
+}
+  `
+
 // Мутация для обновления данных пользователя
 export const UPDATE_ME = gql`
   mutation UpdateMe($input: UpdateUserInput!) {
@@ -65,7 +73,7 @@ export const UPDATE_ME = gql`
       success
       message
       user {
-        id
+        pk
         email
         firstName
         lastName

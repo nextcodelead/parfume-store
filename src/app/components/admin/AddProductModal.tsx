@@ -1,9 +1,27 @@
+'use client';
+
 import React, { useState } from 'react';
+import { useMutation } from '@apollo/client/react';
+import { gql } from '@apollo/client';
 import { X } from 'lucide-react';
 import Button from '../Button';
 import Input from './Input';
 import Textarea from './Textarea';
 import { ProductFormData } from '../../types/product';
+import { Product } from '../../types/graphql';
+import { GET_PRODUCTS } from '../../graphql/queries';
+
+const ADD_PRODUCT = gql`
+  mutation AddProduct($input: ProductInput!) {
+    addProduct(input: $input) {
+      pk
+      name
+      article
+      cost
+      discount
+    }
+  }
+`;
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -12,28 +30,76 @@ interface AddProductModalProps {
 }
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [images, setImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
+    article: '', // ← добавить
+    discount: '0',
     price: '',
-    oldPrice: '', // всегда строка
+    oldPrice: '',
     description: '',
-    notes: '',
     volume: '',
-    quantity: '',
-    images: []
+    brand: '', // ← добавить (будет хранить pk бренда)
+    category: '', // ← добавить (будет хранить pk категории)
+    isPublished: true, // ← добавить
   });
 
-  const handleImageAdd = (url: string) => {
-    if (images.length < 4) {
-      setImages([...images, url]);
+  const [addProduct, { loading: adding, error: mutationError }] = useMutation(ADD_PRODUCT, {
+    // Обновляем локальный кеш GET_PRODUCTS, чтобы новый товар отображался без перезагрузки
+    update(cache, result) {
+      const newProduct = (result as any)?.data?.addProduct;
+      if (!newProduct) return;
+      try {
+        const existing = cache.readQuery({ query: GET_PRODUCTS }) as { products?: Product[] } | null;
+        if (existing?.products) {
+          cache.writeQuery({
+            query: GET_PRODUCTS,
+            data: { products: [newProduct, ...existing.products] },
+          });
+        } else {
+          cache.writeQuery({
+            query: GET_PRODUCTS,
+            data: { products: [newProduct] },
+          });
+        }
+      } catch (e) {
+        // если чтение кеша не удалось, просто ничего не делаем
+        console.warn('Cache update failed', e);
+      }
+    },
+    onCompleted: () => {
+      onClose();
+    },
+    onError: (err: unknown) => {
+      console.error('Add product error:', err);
     }
-  };
+  });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ ...formData, images });
-    onClose();
+      const input = {
+      name: formData.name,
+      article: formData.article,
+      cost: formData.price ? parseFloat(formData.price) : 0,
+      discount: formData.discount ? parseFloat(formData.discount) : 0,
+      description: formData.description,
+      volume: formData.volume ? parseFloat(formData.volume) : 0,
+      brandId: formData.brand ? parseInt(formData.brand) : null,
+      categoryId: formData.category ? parseInt(formData.category) : null,
+      isPublished: formData.isPublished,
+     };
+
+    try {
+      await addProduct({ variables: { input } });
+      // Вызов колбека на случай, если компонент требует локальной обработки
+      try {
+        onSubmit({ ...formData });
+      } catch {
+        // ignore if parent handler not provided or fails
+      }
+      // onCompleted закроет модалку
+    } catch {
+      // Ошибка уже обработана в onError, можно показать сообщение
+    }
   };
 
   if (!isOpen) return null;
@@ -49,28 +115,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Изображения */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Изображения (до 4)</label>
-            <div className="grid grid-cols-4 gap-2">
-              {Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className="aspect-square border-2 border-dashed rounded-lg flex items-center justify-center">
-                  {images[idx] ? (
-                    <img src={images[idx]} alt="" className="w-full h-full object-cover rounded-lg" />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleImageAdd(`https://placeholder.com/400x400?text=Image+${idx + 1}`)}
-                      className="text-sm text-gray-500 hover:text-gray-700"
-                    >
-                      Добавить фото
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
           <Input
             label="Название"
             required
@@ -83,53 +127,64 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
               label="Цена"
               type="number"
               required
-              value={formData.price}
+              value={formData.price ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, price: e.target.value })}
             />
             <Input
               label="Старая цена"
               type="number"
-              value={formData.oldPrice}
+              value={formData.oldPrice ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, oldPrice: e.target.value })}
             />
           </div>
+          <Input
+            label="Артикул"
+            required
+            value={formData.article}
+            onChange={(e) => setFormData({ ...formData, article: e.target.value })}
+          />
+
+          <select 
+            value={formData.brand}
+            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+          >
+            <option value="">Выберите бренд</option>
+            {/* options из данных */}
+          </select>
+
 
           <Textarea
             label="Описание"
             required
-            value={formData.description}
+            value={formData.description ?? ''}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
-          />
-
-          <Textarea
-            label="Ноты аромата"
-            required
-            value={formData.notes}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, notes: e.target.value })}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Объем"
               required
-              value={formData.volume}
+              value={formData.volume ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, volume: e.target.value })}
             />
             <Input
-              label="Количество"
-              type="number"
-              required
-              value={formData.quantity}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, quantity: e.target.value })}
+              label="Категория (ID)"
+              type="text"
+              value={formData.category ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, category: e.target.value })}
             />
           </div>
 
+          {mutationError && (
+            <div className="text-sm text-red-600">Ошибка при добавлении товара. Попробуйте ещё раз.</div>
+          )}
+
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} disabled={adding}>
               Отмена
             </Button>
-            <Button variant="primary" type="submit">
-              Добавить товар
+            <Button variant="primary" type="submit" disabled={adding}>
+              {adding ? 'Добавление...' : 'Добавить товар'}
             </Button>
           </div>
         </form>

@@ -22,14 +22,20 @@ export const useCategories = () => {
 export const useProductsByDiscount = () => {
   const isClient = useIsClient();
   return useQuery(GET_PRODUCTS, {
-    variables: { 
+    variables: {
       "filters": {
         "discount": {
-          "equals": 0
+          "not": 0
         }
       },
+<<<<<<< HEAD
       pagination: {
         limit: 4,
+=======
+      "pagination": {
+        "limit": 4,
+        "offset": 0
+>>>>>>> 3d5ef32 (some changes)
       }
     },
     fetchPolicy: 'cache-first',

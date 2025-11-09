@@ -3,9 +3,9 @@ import { gql } from '@apollo/client';
 
 
 // Запрос для получения конкретного продукта (ИСПРАВЛЕННЫЙ)
-export const GET_PRODUCT = gql`
-  query GetProduct($pk: Int!) {
-    product(pk: $pk) {
+export const GET_PRODUCTS = gql`
+  query GetProducts($filters: ProductFilter, $pagination: PaginationInput) {
+    products(filters: $filters, pagination: $pagination) {
       pk
       name
       article
@@ -21,16 +21,6 @@ export const GET_PRODUCT = gql`
       category {
         pk
         name
-      }
-      images {
-        pk
-        imageUrl  # ✅ исправлено с url на imageUrl
-        asMain
-      }
-      stocks {
-        pk
-        quantity
-        # size может называться иначе, пока уберем
       }
     }
   }
@@ -61,9 +51,10 @@ export const GET_CATEGORIES = gql`
     }
   }
 `;
-export const GET_PRODUCTS = gql`
-  query byPromotion ($filters: ProductFilter, $pagination: PaginationInput) {
-    products(filters: $filters, pagination: $pagination) {
+
+export const GET_PRODUCTS_BY_PROMOTION = gql`
+  query byPromotion($filters: ProductFilter, $pagination: PaginationInput) {
+    byPromotion(filters: $filters, pagination: $pagination) {
       pk
       photoUrl
       discount
@@ -74,6 +65,7 @@ export const GET_PRODUCTS = gql`
 `;
 
 
+<<<<<<< HEAD
 export const GET_PRODUCTS_ADMIN = gql`
   query byPromotion ($filters: ProductFilter, $pagination: PaginationInput) {
     products(filters: $filters, pagination: $pagination) {
@@ -98,6 +90,8 @@ export const GET_PRODUCTS_COUNT_ADMIN = gql`
 
 
 
+=======
+>>>>>>> 3d5ef32 (some changes)
 // TODO проверить и исправить под реальную схему
 export const GET_USER_CART = gql` 
   query categories($filter: CategoryFilter) {

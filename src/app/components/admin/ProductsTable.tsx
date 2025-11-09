@@ -50,6 +50,7 @@ const ProductsTable: React.FC = () => {
             variant="primary" 
             leftIcon={<Plus size={20} />}
             onClick={() => setIsAddModalOpen(true)}
+            
           >
             Добавить товар
           </Button>
