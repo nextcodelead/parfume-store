@@ -1,27 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useMutation } from '@apollo/client/react';
-import { gql } from '@apollo/client';
+import React, { FormEvent, useState } from 'react';
 import { X } from 'lucide-react';
 import Button from '../Button';
 import Input from './Input';
 import Textarea from './Textarea';
 import { ProductFormData } from '../../types/product';
-import { Product } from '../../types/graphql';
-import { GET_PRODUCTS } from '../../graphql/queries';
-
-const ADD_PRODUCT = gql`
-  mutation AddProduct($input: ProductInput!) {
-    addProduct(input: $input) {
-      pk
-      name
-      article
-      cost
-      discount
-    }
-  }
-`;
+import CategorySelect from '../CategoriesMenu/CategorySelect';
+import BrandSelect from '../CategoriesMenu/BrandSelect';
+import { useAddProduct } from '@/app/hooks/useProducts';
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -33,71 +20,47 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     article: '', // ← добавить
-    discount: '0',
-    price: '',
-    oldPrice: '',
+    discount: 0,
+    categoryId: null,
+    brandId: null,
+    cost: null,
     description: '',
-    volume: '',
-    brand: '', // ← добавить (будет хранить pk бренда)
-    category: '', // ← добавить (будет хранить pk категории)
-    isPublished: true, // ← добавить
+    volume: null,
   });
+  const [addProduct, { loading: adding, error }] = useAddProduct();
 
-  const [addProduct, { loading: adding, error: mutationError }] = useMutation(ADD_PRODUCT, {
-    // Обновляем локальный кеш GET_PRODUCTS, чтобы новый товар отображался без перезагрузки
-    update(cache, result) {
-      const newProduct = (result as any)?.data?.addProduct;
-      if (!newProduct) return;
-      try {
-        const existing = cache.readQuery({ query: GET_PRODUCTS }) as { products?: Product[] } | null;
-        if (existing?.products) {
-          cache.writeQuery({
-            query: GET_PRODUCTS,
-            data: { products: [newProduct, ...existing.products] },
-          });
-        } else {
-          cache.writeQuery({
-            query: GET_PRODUCTS,
-            data: { products: [newProduct] },
-          });
-        }
-      } catch (e) {
-        console.warn('Cache update failed', e);
-      }
-    },
-    onCompleted: () => {
-      onClose();
-    },
-    onError: (err: unknown) => {
-      console.error('Add product error:', err);
-    }
-  });
+  const sanitizeInput = (data: ProductFormData) => {
+    // Приводим типы и убираем пустые/null поля, если нужно
+    const input: any = {};
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (data.name) input.name = data.name;
+    if (data.article) input.article = data.article;
+    // discount — число
+    input.discount = data.discount ?? 0;
+
+    // если categoryId/brandId могут быть number|null — отправляем null или не включаем поле
+    if (data.categoryId !== null && data.categoryId !== undefined) input.categoryId = data.categoryId;
+    if (data.brandId !== null && data.brandId !== undefined) input.brandId = data.brandId;
+
+    if (data.cost !== null && data.cost !== undefined) input.cost = data.cost;
+    if (data.description) input.description = data.description;
+    if (data.volume !== null && data.volume !== undefined) input.volume = data.volume;
+
+    return input;
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-      const input = {
-      name: formData.name,
-      article: formData.article,
-      cost: formData.price ? parseFloat(formData.price) : 0,
-      discount: formData.discount ? parseFloat(formData.discount) : 0,
-      description: formData.description,
-      volume: formData.volume ? parseFloat(formData.volume) : 0,
-      brandId: formData.brand ? parseInt(formData.brand) : null,
-      categoryId: formData.category ? parseInt(formData.category) : null,
-      isPublished: formData.isPublished,
-     };
 
     try {
-      await addProduct({ variables: { input } });
-      // Вызов колбека на случай, если компонент требует локальной обработки
-      try {
-        onSubmit({ ...formData });
-      } catch {
-        // ignore if parent handler not provided or fails
-      }
-      // onCompleted закроет модалку
-    } catch {
-      // Ошибка уже обработана в onError, можно показать сообщение
+      const input = sanitizeInput(formData);
+      const result = await addProduct({ variables: { input } });
+      console.log("✅ Добавлено:", result.data?.addProduct);
+      // вызвать родительский onSubmit, закрыть модалку и/или очистить форму
+      onSubmit(formData);
+      onClose();
+    } catch (err) {
+      console.error("❌ Ошибка добавления:", err);
     }
   };
 
@@ -120,20 +83,23 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             value={formData.name}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
           />
-
+          <CategorySelect
+            value={formData.categoryId}
+            onChange={(value) => setFormData({ ...formData, categoryId: value })}
+          />
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Цена"
               type="number"
               required
-              value={formData.price ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, price: e.target.value })}
+              value={String(formData.discount ?? 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, discount: Number(e.target.value) })}
             />
             <Input
               label="Старая цена"
               type="number"
-              value={formData.oldPrice ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, oldPrice: e.target.value })}
+              value={String(formData.cost ?? 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, cost: Number(e.target.value) })}
             />
           </div>
           <Input
@@ -143,14 +109,10 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             onChange={(e) => setFormData({ ...formData, article: e.target.value })}
           />
 
-          <select 
-            value={formData.brand}
-            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-          >
-            <option value="">Выберите бренд</option>
-            {/* options из данных */}
-          </select>
-
+          <BrandSelect 
+            value={formData.brandId}
+            onChange={(value) => setFormData({ ...formData, brandId: value })}
+          />
 
           <Textarea
             label="Описание"
@@ -163,18 +125,12 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             <Input
               label="Объем"
               required
-              value={formData.volume ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, volume: e.target.value })}
-            />
-            <Input
-              label="Категория (ID)"
-              type="text"
-              value={formData.category ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, category: e.target.value })}
+              value={String(formData.volume ?? 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, volume: Number(e.target.value) })}
             />
           </div>
 
-          {mutationError && (
+          {error && (
             <div className="text-sm text-red-600">Ошибка при добавлении товара. Попробуйте ещё раз.</div>
           )}
 
@@ -182,7 +138,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             <Button variant="outline" onClick={onClose} disabled={adding}>
               Отмена
             </Button>
-            <Button variant="primary" type="submit" disabled={adding}>
+            <Button variant="primary" type="submit" onSubmit={handleSubmit} disabled={adding}>
               {adding ? 'Добавление...' : 'Добавить товар'}
             </Button>
           </div>

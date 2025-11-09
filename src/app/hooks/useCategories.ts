@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client/react';
-import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS, GET_PRODUCTS_ADMIN, GET_PRODUCTS_COUNT_ADMIN } from '../graphql/queries';
+import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS, GET_PRODUCTS_ADMIN, GET_PRODUCTS_COUNT_ADMIN, ADMIN_CREATE_PRODUCT_SELECT_CATEGORY } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
 
 // Хук для получения всех категорий
@@ -19,6 +19,16 @@ export const useCategories = () => {
   });
 };
 
+export const useSelectCategories = () => {
+  const isClient = useIsClient();
+  return useQuery(ADMIN_CREATE_PRODUCT_SELECT_CATEGORY, {
+    variables: {},
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    skip: !isClient,
+  });
+};
+
 export const useProductsByDiscount = () => {
   const isClient = useIsClient();
   return useQuery(GET_PRODUCTS, {
@@ -28,14 +38,9 @@ export const useProductsByDiscount = () => {
           "not": 0
         }
       },
-<<<<<<< HEAD
-      pagination: {
-        limit: 4,
-=======
       "pagination": {
         "limit": 4,
         "offset": 0
->>>>>>> 3d5ef32 (some changes)
       }
     },
     fetchPolicy: 'cache-first',

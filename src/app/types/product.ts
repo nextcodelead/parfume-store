@@ -1,14 +1,12 @@
 export interface ProductFormData {
   name: string;
   article: string;
-  discount?: string; // хранится как строка в форме
-  price?: string; // цена в форме как строка
-  oldPrice?: string;
+  categoryId: number | null;
+  brandId: number | null;
+  discount: number | null; 
+  cost: number | null;
   description?: string;
-  volume?: string; // объем как строка
-  brand?: string; // будет содержать PK бренда в виде строки
-  category?: string; // будет содержать PK категории в виде строки
-  isPublished?: boolean;
+  volume: number | null;
 }
 
 export interface Product {

@@ -1,34 +1,38 @@
-import { useState } from "react";
+import { useSelectCategories } from "@/app/hooks/useCategories";
 
-const CategorySelect = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+interface CategorySelectProps {
+  value: number | null;
+  onChange: (value: number) => void;
+}
 
-  const categories = ["Perfume", "Makeup", "Skincare", "Haircare"];
+const CategorySelect: React.FC<CategorySelectProps> = ({ value, onChange }) => {
+  const { data, loading, error } = useSelectCategories();
+  const categories = data?.categories || [];
+
+  if (loading) return <p>Loading categories...</p>;
+  if (error) return <p>Error loading categories: {error.message}</p>;
+  const selectedValue = value ?? (categories.length > 0 ? Number(categories[0].pk) : "");
+  if (value === null && categories.length > 0) {
+    onChange(Number(categories[0].pk));
+  }
 
   return (
     <div className="w-full max-w-sm">
       <label htmlFor="category" className="block text-sm font-medium mb-1">
-        Choose category:
+        Выберите категорию:
       </label>
       <select
         id="category"
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
+        value={selectedValue}
+        onChange={(e) => onChange(Number(e.target.value))}
         className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
-        <option value="">Select category</option>
         {categories.map((category) => (
-          <option key={category} value={category}>
-            {category}
+          <option key={category.pk} value={category.pk}>
+            {category.name}
           </option>
         ))}
       </select>
-
-      {selectedCategory && (
-        <p className="mt-2 text-sm text-gray-700">
-          Selected: <strong>{selectedCategory}</strong>
-        </p>
-      )}
     </div>
   );
 };

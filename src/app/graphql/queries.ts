@@ -65,7 +65,6 @@ export const GET_PRODUCTS_BY_PROMOTION = gql`
 `;
 
 
-<<<<<<< HEAD
 export const GET_PRODUCTS_ADMIN = gql`
   query byPromotion ($filters: ProductFilter, $pagination: PaginationInput) {
     products(filters: $filters, pagination: $pagination) {
@@ -88,10 +87,24 @@ export const GET_PRODUCTS_COUNT_ADMIN = gql`
   }
 `;
 
+export const ADMIN_CREATE_PRODUCT_SELECT_CATEGORY = gql`
+  query categories {
+    categories {
+      pk
+      name
+    }
+  }
+`;
+export const ADMIN_CREATE_PRODUCT_SELECT_BRAND = gql`
+  query brands {
+    brands {
+      pk
+      name
+    }
+  }
+`;
 
 
-=======
->>>>>>> 3d5ef32 (some changes)
 // TODO проверить и исправить под реальную схему
 export const GET_USER_CART = gql` 
   query categories($filter: CategoryFilter) {

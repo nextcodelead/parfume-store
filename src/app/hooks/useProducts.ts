@@ -1,22 +1,19 @@
-<<<<<<< HEAD
 import { useMutation, useQuery } from '@apollo/client/react';
-import { GET_PRODUCTS, GET_PRODUCT } from '../graphql/queries';
+import { GET_PRODUCTS } from '../graphql/queries';
 import { ADMIN_ADD_PRODUCT } from '../graphql/mutations';
 
 export interface ProductInput {
   name: string,
   cost: number,
+  categoryId: number,
+  brandId: number,
+  article: string,
   discount: number,
   description: string,
   aromNote: string | null,
   volume: number,
   count: number
 }
-=======
-import { useQuery, useMutation } from '@apollo/client/react';
-import { GET_PRODUCTS, GET_PRODUCT } from '../graphql/queries';
-import { addProduct } from '../graphql/mutations';
->>>>>>> 3d5ef32 (some changes)
 
 // Хук для получения списка продуктов
 export const useProducts = () => {
@@ -26,25 +23,6 @@ export const useProducts = () => {
   });
 };
 
-// Хук для получения конкретного продукта
-export const useProduct = (pk: number) => {
-  return useQuery(GET_PRODUCT, {
-    variables: { pk },
-    skip: !pk,
-    fetchPolicy: 'cache-first',
-    errorPolicy: 'all',
-  });
+export const useAddProduct = () => {
+  return useMutation(ADMIN_ADD_PRODUCT, { errorPolicy: "all" });
 };
-
-<<<<<<< HEAD
-export const useAddProduct = (input: ProductInput) => {
-  return useMutation(ADMIN_ADD_PRODUCT, {
-    variables: { input },
-    errorPolicy: 'all',
-  });
-};
-=======
-export const useAdd = () => {
-  return useMutation(addProduct)
-}
->>>>>>> 3d5ef32 (some changes)
