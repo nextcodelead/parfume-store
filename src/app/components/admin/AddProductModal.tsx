@@ -62,7 +62,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
           });
         }
       } catch (e) {
-        // если чтение кеша не удалось, просто ничего не делаем
         console.warn('Cache update failed', e);
       }
     },
