@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client/react';
 import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS, GET_PRODUCTS_ADMIN, GET_PRODUCTS_COUNT_ADMIN, ADMIN_CREATE_PRODUCT_SELECT_CATEGORY } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
 
-// Хук для получения всех категорий
 export const useCategories = () => {
   const isClient = useIsClient();
   return useQuery(GET_CATEGORIES, {

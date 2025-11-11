@@ -17,34 +17,51 @@ interface AddProductModalProps {
 }
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState<ProductFormData>({
+  const [formData, setFormData] = useState<
+    ProductFormData & { image?: string | null; file?: File | null; quantity?: string }
+  >({
     name: '',
-    article: '', // ← добавить
+    article: '',
     discount: 0,
     categoryId: null,
     brandId: null,
     cost: null,
     description: '',
     volume: null,
+    image: null,
+    file: null,
+    quantity: '0',
   });
+
   const [addProduct, { loading: adding, error }] = useAddProduct();
 
-  const sanitizeInput = (data: ProductFormData) => {
-    // Приводим типы и убираем пустые/null поля, если нужно
+  // Обработчик выбора файла: читаем как data URL для превью
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) {
+      setFormData({ ...formData, file: null, image: null });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormData({ ...formData, file, image: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const sanitizeInput = (data: ProductFormData & { image?: string | null; quantity?: string }) => {
     const input: any = {};
 
     if (data.name) input.name = data.name;
     if (data.article) input.article = data.article;
-    // discount — число
     input.discount = data.discount ?? 0;
-
-    // если categoryId/brandId могут быть number|null — отправляем null или не включаем поле
     if (data.categoryId !== null && data.categoryId !== undefined) input.categoryId = data.categoryId;
     if (data.brandId !== null && data.brandId !== undefined) input.brandId = data.brandId;
-
     if (data.cost !== null && data.cost !== undefined) input.cost = data.cost;
     if (data.description) input.description = data.description;
     if (data.volume !== null && data.volume !== undefined) input.volume = data.volume;
+    if (data.quantity) input.quantity = Number(data.quantity);
+    if (data.image) input.image = data.image;
 
     return input;
   };
@@ -55,12 +72,12 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
     try {
       const input = sanitizeInput(formData);
       const result = await addProduct({ variables: { input } });
-      console.log("✅ Добавлено:", result.data?.addProduct);
-      // вызвать родительский onSubmit, закрыть модалку и/или очистить форму
+      console.log('✅ Добавлено:', result.data?.addProduct);
+
       onSubmit(formData);
       onClose();
     } catch (err) {
-      console.error("❌ Ошибка добавления:", err);
+      console.error('❌ Ошибка добавления:', err);
     }
   };
 
@@ -81,27 +98,30 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             label="Название"
             required
             value={formData.name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
+
           <CategorySelect
             value={formData.categoryId}
             onChange={(value) => setFormData({ ...formData, categoryId: value })}
           />
+
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Цена"
               type="number"
               required
               value={String(formData.discount ?? 0)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, discount: Number(e.target.value) })}
+              onChange={(e) => setFormData({ ...formData, discount: Number(e.target.value) })}
             />
             <Input
               label="Старая цена"
               type="number"
               value={String(formData.cost ?? 0)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, cost: Number(e.target.value) })}
+              onChange={(e) => setFormData({ ...formData, cost: Number(e.target.value) })}
             />
           </div>
+
           <Input
             label="Артикул"
             required
@@ -109,7 +129,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             onChange={(e) => setFormData({ ...formData, article: e.target.value })}
           />
 
-          <BrandSelect 
+          <BrandSelect
             value={formData.brandId}
             onChange={(value) => setFormData({ ...formData, brandId: value })}
           />
@@ -118,7 +138,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             label="Описание"
             required
             value={formData.description ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
 
           <div className="grid grid-cols-2 gap-4">
@@ -126,8 +146,36 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
               label="Объем"
               required
               value={String(formData.volume ?? 0)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, volume: Number(e.target.value) })}
+              onChange={(e) => setFormData({ ...formData, volume: Number(e.target.value) })}
             />
+          </div>
+
+          {/* Новые поля: количество и изображение */}
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Количество"
+              type="number"
+              required
+              value={formData.quantity ?? '0'}
+              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+            />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Изображение</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-700"
+              />
+              {formData.image && (
+                <img
+                  src={formData.image}
+                  alt="preview"
+                  className="mt-2 h-24 w-24 object-cover rounded"
+                />
+              )}
+            </div>
           </div>
 
           {error && (
@@ -138,7 +186,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             <Button variant="outline" onClick={onClose} disabled={adding}>
               Отмена
             </Button>
-            <Button variant="primary" type="submit" onSubmit={handleSubmit} disabled={adding}>
+            <Button variant="primary" type="submit" disabled={adding}>
               {adding ? 'Добавление...' : 'Добавить товар'}
             </Button>
           </div>
