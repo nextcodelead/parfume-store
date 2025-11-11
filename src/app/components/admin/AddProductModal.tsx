@@ -18,7 +18,7 @@ interface AddProductModalProps {
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState<
-    ProductFormData & { image?: string | null; file?: File | null; quantity?: string }
+    ProductFormData & { images?: string[]; files?: File[]; quantity?: string }
   >({
     name: '',
     article: '',
@@ -27,53 +27,55 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
     brandId: null,
     cost: null,
     description: '',
-    volume: null,
-    image: null,
-    file: null,
+    volume: '',
     quantity: '0',
+    images: [null, null, null, null], // 4 фото
+    files: [null, null, null, null],
   });
 
   const [addProduct, { loading: adding, error }] = useAddProduct();
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  // Обработчик выбора файла: читаем как data URL для превью
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
-    if (!file) {
-      setFormData({ ...formData, file: null, image: null });
-      return;
+    const newFiles = [...(formData.files ?? [])];
+    const newImages = [...(formData.images ?? [])];
+
+    newFiles[index] = file;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        newImages[index] = reader.result as string;
+        setFormData({ ...formData, files: newFiles, images: newImages });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      newImages[index] = null;
+      setFormData({ ...formData, files: newFiles, images: newImages });
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormData({ ...formData, file, image: reader.result as string });
-    };
-    reader.readAsDataURL(file);
   };
 
-  const sanitizeInput = (data: ProductFormData & { image?: string | null; quantity?: string }) => {
+  const sanitizeInput = (data: typeof formData) => {
     const input: any = {};
-
     if (data.name) input.name = data.name;
     if (data.article) input.article = data.article;
     input.discount = data.discount ?? 0;
-    if (data.categoryId !== null && data.categoryId !== undefined) input.categoryId = data.categoryId;
-    if (data.brandId !== null && data.brandId !== undefined) input.brandId = data.brandId;
-    if (data.cost !== null && data.cost !== undefined) input.cost = data.cost;
+    if (data.categoryId != null) input.categoryId = data.categoryId;
+    if (data.brandId != null) input.brandId = data.brandId;
+    if (data.cost != null) input.cost = data.cost;
     if (data.description) input.description = data.description;
-    if (data.volume !== null && data.volume !== undefined) input.volume = data.volume;
+    if (data.volume != null) input.volume = data.volume;
     if (data.quantity) input.quantity = Number(data.quantity);
-    if (data.image) input.image = data.image;
-
+    if (data.images) input.images = data.images.filter(Boolean); // убираем null
     return input;
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     try {
       const input = sanitizeInput(formData);
       const result = await addProduct({ variables: { input } });
       console.log('✅ Добавлено:', result.data?.addProduct);
-
       onSubmit(formData);
       onClose();
     } catch (err) {
@@ -94,6 +96,30 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+          <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Фотографии</label>
+              <div className="flex gap-2">
+                {(formData.images ?? []).map((img, i) => (
+                  <div key={i} className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange(i)}
+                      className="block w-20 h-20 opacity-0 absolute top-0 left-0 cursor-pointer"
+                    />
+                    <div
+                      className={`w-20 h-20 border rounded flex items-center justify-center cursor-pointer ${
+                        activeImageIndex === i ? 'border-blue-500' : 'border-gray-300'
+                      }`}
+                      onClick={() => setActiveImageIndex(i)}
+                    >
+                      {img ? <img src={img} alt={`preview-${i}`} className="w-full h-full object-cover rounded" /> : <span>+</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           <Input
             label="Название"
             required
@@ -150,7 +176,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
             />
           </div>
 
-          {/* Новые поля: количество и изображение */}
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Количество"
@@ -160,22 +185,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onSu
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
             />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Изображение</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-gray-700"
-              />
-              {formData.image && (
-                <img
-                  src={formData.image}
-                  alt="preview"
-                  className="mt-2 h-24 w-24 object-cover rounded"
-                />
-              )}
-            </div>
+
           </div>
 
           {error && (
