@@ -11,7 +11,9 @@ export const GET_PRODUCTS = gql`
       article
       cost
       discount
-      photoUrl
+      photo {
+        imageUrl
+      }
       description
       isPublished
       brand {
@@ -56,7 +58,9 @@ export const GET_PRODUCTS_BY_PROMOTION = gql`
   query byPromotion($filters: ProductFilter, $pagination: PaginationInput) {
     byPromotion(filters: $filters, pagination: $pagination) {
       pk
-      photoUrl
+      photo {
+        imageUrl
+      }
       discount
       name
       cost
@@ -73,7 +77,9 @@ export const GET_PRODUCTS_ADMIN = gql`
       category {
         name
       }
-      photoUrl
+      photo {
+        imageUrl
+      }
       cost
       count
       countCells
@@ -128,6 +134,40 @@ export const GET_ME = gql`
   query categories($filter: CategoryFilter) {
     categories(filters: $filter) {
       pk
+    }
+  }
+`;
+
+export const GET_PRODUCT_IMAGES = gql` 
+  query getImages($filters: ProductImageFilter) {
+    productImages(filters: $filters) {
+      pk
+      asMain
+      imageUrl
+    }
+  }
+`;
+export const GET_PRODUCT = gql` 
+  query ($productId: Int!) {
+    product(id: $productId) {
+      pk
+      aromNote
+      article
+      brandId
+      categoryId
+      cost
+      count
+      description
+      discount
+      index
+      isPublished
+      name
+      sex
+      showAtMain
+      size
+      unit
+      volume
+      weight
     }
   }
 `;

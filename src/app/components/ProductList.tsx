@@ -15,7 +15,9 @@ type Brand = {
 type Product = {
   pk: number;
   name: string;
-  photoUrl?: string;
+  photo: {
+    imageUrl: string;
+  } | null;
   article: string;
   cost: number;
   brand?: Brand;
@@ -74,9 +76,9 @@ export default function ProductList() {
         {products.map((product) => (
           <div key={product.pk} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
             <div className="aspect-square bg-gray-100 flex items-center justify-center">
-              {product.photoUrl ? (
+              {product.photo?.imageUrl ? (
                 <img 
-                  src={product.photoUrl} 
+                  src={product.photo.imageUrl} 
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />

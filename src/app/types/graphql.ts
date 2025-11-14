@@ -5,7 +5,9 @@ export interface Product {
   name: string;
   cost: number; // ← использовать cost вместо price
   discount?: number;
-  photoUrl?: string;
+  photo: {
+    imageUrl: string;
+  } | null;
   description?: string;
   isPublished?: boolean;
   // Дополнительные поля если нужны

@@ -106,3 +106,42 @@ export const UPDATE_USER = gql`
     }
   }
 `;
+
+export const ADD_OR_UPDATE_IMAGE_PRODUCT = gql`
+  mutation($pk: Int, $input: ProductImageInput!) {
+    addOrUpdateImageProduct(pk: $pk, input: $input) {
+      pk
+      imageUrl
+      asMain
+    }
+  }
+`;
+export const DELETE_PRODUCT_IMAGE = gql`
+  mutation($pk: Int!) {
+    deleteProductImage(pk: $pk) {
+      pk
+    }
+  }
+`;
+
+export const UPDATE_PRODUCT_IMAGE = gql`
+  mutation($pk: Int!, $input: ProductImageInput!) {
+    updateProductImage(pk: $pk, input: $input) {
+      pk
+    }
+  }
+`;
+export const UPDATE_PRODUCT = gql`
+  mutation($pk: Int!, $input: ProductInput!) {
+    updateProduct(pk: $pk, input: $input) {
+      pk
+    }
+  }
+`;
+export const DELETE_PRODUCT = gql`
+  mutation($pk: Int!) {
+    deleteProduct(pk: $pk) {
+      pk
+    }
+  }
+`;

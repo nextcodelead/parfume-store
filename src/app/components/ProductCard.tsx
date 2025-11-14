@@ -35,7 +35,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false }) => {
         <Heart size={20} className={isFavorite ? "fill-rose-600 text-rose-600" : "text-gray-400"} />
       </button>
 
-      <div className="text-6xl text-center my-6">{product.photoUrl}</div>
+      <div className="text-6xl text-center my-6">{product.photo?.imageUrl}</div>
       
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
       {/* TODO */}

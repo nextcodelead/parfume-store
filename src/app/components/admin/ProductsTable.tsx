@@ -1,25 +1,29 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Plus, Eye, Edit, Trash2, Download } from 'lucide-react';
-import { Product } from '../../types/admin';
+import { Search, Plus, Eye, Edit, Trash2, Download, Upload } from 'lucide-react';
 import { ProductFormData } from '../../types/product';
-import { PRODUCTS_DATA } from '../../data/adminData';
 import Button from '../Button';
 import AddProductModal from './AddProductModal';
 import { useAdminProducts, useAdminProductsCount } from '@/app/hooks/useCategories';
+import UploadImageModal from './UploadImageModal';
+import { useDeleteProduct } from '@/app/hooks/useProducts';
+
 
 const ProductsTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const { data, loading, error } = useAdminProducts(searchTerm, currentPage);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [isUploadImageModalOpen, setIsUploadImageModalOpen] = useState(false);
+  const { data, loading, error, refetch } = useAdminProducts(searchTerm, currentPage);
   const { data: dataProductsCount, loading: loadingProductsCount, error: errorProductsCount } = useAdminProductsCount(searchTerm);
+  const [deleteProduct, { loading: deleting, error: deleteError }] = useDeleteProduct();
 
   const handleAddProduct = (productData: ProductFormData) => {
     console.log('New product:', productData);
-    // Здесь будет логика добавления продукта
+    refetch();
   };
 
   const getStatusBadge = (status: string) => {
@@ -102,12 +106,13 @@ const ProductsTable: React.FC = () => {
             {loading && <tr><td colSpan={7} className="text-center py-4">Загрузка...</td></tr>}
             {error && <tr><td colSpan={7} className="text-center py-4">Ошибка загрузки</td></tr>}
             {data && data.products.map((product) => (
-              <tr key={product.id} className="hover:bg-gray-50">
+              <tr key={product.pk} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
                       {/* {product.image} */}
-                      {product.photoUrl ? product.photoUrl : <span>🌹</span>}
+                      {product.photo?.imageUrl ? 
+                      <img src={`https://dataset.uz/${product.photo.imageUrl}`} alt={`Product Image ${product.pk}`} width={80} height={80} className="object-cover rounded" /> : <span>🌹</span>}
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900">{product.name}</p>
@@ -126,13 +131,31 @@ const ProductsTable: React.FC = () => {
                 <td className="px-6 py-4">{getStatusBadge(product.status)}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
+                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" onClick={() => {
+                      setSelectedProductId(product.pk);
+                      setIsUploadImageModalOpen(true);
+                    }}>
+                      <Upload size={18} />
+                    </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye size={18} />
                     </button>
-                    <button className="p-2 hover:bg-blue-100 rounded-lg text-blue-600">
+                    <button className="p-2 hover:bg-blue-100 rounded-lg text-blue-600" onClick={()=>{
+                      setSelectedProductId(product.pk);
+                      setIsAddModalOpen(true);
+                    }}>
                       <Edit size={18} />
                     </button>
-                    <button className="p-2 hover:bg-red-100 rounded-lg text-red-600">
+                    <button className="p-2 hover:bg-red-100 rounded-lg text-red-600" onClick={async () => {
+                      if(confirm('Вы уверены, что хотите удалить этот товар?')) {
+                        try {
+                          await deleteProduct({ variables: { pk: product.pk } });
+                          refetch();
+                        } catch (err) {
+                          console.error('❌ Ошибка удаления:', err);
+                        }
+                      }
+                    }}>
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -170,8 +193,14 @@ const ProductsTable: React.FC = () => {
       {/* Add Product Modal */}
       <AddProductModal
         isOpen={isAddModalOpen}
+        productId={selectedProductId}
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={handleAddProduct}
+      />
+      <UploadImageModal
+        isOpen={isUploadImageModalOpen}
+        onClose={() => setIsUploadImageModalOpen(false)}
+        productId={selectedProductId}
       />
     </div>
   );
