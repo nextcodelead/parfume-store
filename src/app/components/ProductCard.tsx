@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { Product } from '../types/graphql';
 
-
 interface Props {
   product: Product;
   showDiscount?: boolean;

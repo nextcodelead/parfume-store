@@ -39,9 +39,6 @@ export default function ProductPage({ params }: PageProps) {
           <section>
             <FragranceNotes notes={product.notes} />
           </section>
-          <section>
-            <ReviewsSection/>
-          </section>
         </div>
       </main>
       <Footer></Footer>

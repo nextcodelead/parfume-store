@@ -56,10 +56,10 @@ export const ORDERS_DATA: Order[] = [
 ];
 
 export const MENU_ITEMS: MenuItem[] = [
-  { id: 'dashboard', label: 'Дашборд', icon: 'layoutDashboard' },
   { id: 'products', label: 'Товары', icon: 'package' },
-  { id: 'orders', label: 'Заказы', icon: 'shoppingCart' },
-  { id: 'customers', label: 'Клиенты', icon: 'users' },
-  { id: 'analytics', label: 'Аналитика', icon: 'trendingUp' },
-  { id: 'settings', label: 'Настройки', icon: 'settings' }
+  // { id: 'dashboard', label: 'Дашборд', icon: 'layoutDashboard' },
+  // { id: 'orders', label: 'Заказы', icon: 'shoppingCart' },
+  // { id: 'customers', label: 'Клиенты', icon: 'users' },
+  // { id: 'analytics', label: 'Аналитика', icon: 'trendingUp' },
+  // { id: 'settings', label: 'Настройки', icon: 'settings' }
 ];

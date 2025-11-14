@@ -2,6 +2,7 @@ import React from 'react';
 import { X, LogOut } from 'lucide-react';
 import { MenuItem } from '../../types/admin';
 import { MENU_ITEMS } from '../../data/adminData';
+import Link from 'next/link';
 
 interface SidebarProps {
   activeTab: string;
@@ -29,13 +30,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isMobileOpen,
       >
         {/* Logo */}
         <div className="p-6 border-b border-gray-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-3xl">🌸</span>
             <div>
               <h1 className="text-lg font-bold">Essence Luxe</h1>
               <p className="text-xs text-gray-400">Админ панель</p>
             </div>
-          </div>
+          </Link>
           <button onClick={onMobileClose} className="lg:hidden">
             <X size={24} />
           </button>
