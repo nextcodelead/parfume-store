@@ -1,19 +1,29 @@
 "use client";
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useProductImagesClient } from "@/app/hooks/useProducts";
 
 interface Props {
-  images: string[];
+  productId: number;
 }
 
-const ProductImageGallery: React.FC<{ images: string[] }> = ({ images }) => {
+const ProductImageGallery: React.FC<Props> = ({ productId }) => {
+  const {load, data, error, refetch} = useProductImagesClient(productId);
   const [currentImage, setCurrentImage] = useState(0);
-
+  if (error) {
+    return <div>Error loading images</div>;
+  }
+  if (load || !data) {
+    return <div>Loading images...</div>;
+  }
+  const images = data.product.images.map((img: any) => img.imageUrl);
   return (
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative bg-gray-100 rounded-2xl aspect-square flex items-center justify-center overflow-hidden group">
-        <div className="text-9xl">{images[currentImage]}</div>
+        <div className="text-9xl">
+          <img src={`https://dataset.uz/${images[currentImage]}`} alt={`Product Image ${currentImage + 1}`} className="object-contain w-full h-full" />
+        </div>
         
         {/* Navigation Arrows */}
         {images.length > 1 && (
@@ -44,7 +54,7 @@ const ProductImageGallery: React.FC<{ images: string[] }> = ({ images }) => {
               currentImage === idx ? 'ring-2 ring-rose-600' : ''
             }`}
           >
-            {img}
+            <img src={`https://dataset.uz/${images[idx]}`} alt={`Product Image ${idx + 1}`} className="object-contain w-full h-full" />
           </button>
         ))}
       </div>

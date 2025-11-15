@@ -1,20 +1,24 @@
+export interface StockFormData {
+  productId: number;
+  article: string;
+  cost: number;
+  discount: number;
+  quantity: number;
+  volume: number;
+  weight: number;
+  size: string | null;
+  unit: string | null;
+}
+
 export interface ProductFormData {
   name: string;
-  article: string;
   categoryId: number | null;
   brandId: number | null;
-  discount: number | null; 
-  cost: number | null;
   description: string;
-  volume: number | null;
   aromNote: string;
-  count: number;
   index: number;
   isPublished: boolean;
   sex: string;
-  weight: number;
-  unit: string;
-  size: string;
   showAtMain: boolean;
 }
 

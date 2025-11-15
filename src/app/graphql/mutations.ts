@@ -145,3 +145,42 @@ export const DELETE_PRODUCT = gql`
     }
   }
 `;
+export const DELETE_STOCK = gql`
+  mutation($pk: Int!) {
+    deleteStock(pk: $pk) {
+      pk
+    }
+  }
+`;
+export const ADD_STOCK = gql`
+  mutation($input: StockInput!) {
+    addStock(input: $input) {
+      pk
+      article
+      cost
+      discount
+      productId
+      quantity
+      size
+      unit
+      volume
+      weight
+    }
+  }
+`;
+export const UPDATE_STOCK = gql`
+  mutation($pk: Int!, $input: StockInput!) {
+    updateStock(pk: $pk, input: $input) {
+      pk
+      article
+      cost
+      discount
+      productId
+      quantity
+      size
+      unit
+      volume
+      weight
+    }
+  }
+`;

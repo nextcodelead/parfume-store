@@ -80,7 +80,6 @@ export const GET_PRODUCTS_ADMIN = gql`
       photo {
         imageUrl
       }
-      cost
       count
       countCells
       status
@@ -152,22 +151,83 @@ export const GET_PRODUCT = gql`
     product(id: $productId) {
       pk
       aromNote
-      article
       brandId
       categoryId
-      cost
-      count
       description
-      discount
       index
       isPublished
       name
       sex
       showAtMain
+    }
+  }
+`;
+
+export const GET_STOCKS = gql` 
+  query stocks($filters: StockFilter) {
+    stocks(filters: $filters) {
+      pk
+      article
+      cost
+      discount
+      productId
+      quantity
       size
       unit
       volume
       weight
+    }
+  }
+`;
+export const GET_STOCK = gql` 
+  query($stockId: Int!) {
+    stock(id: $stockId) {
+      pk
+      article
+      cost
+      discount
+      productId
+      quantity
+      size
+      unit
+      volume
+      weight
+    }
+  }
+`;
+export const GET_PRODUCT_CLIENT = gql` 
+  query($productId: Int!) {
+    product(id: $productId) {
+      brand {
+        name
+      }
+      categoryRoute {
+        name
+      }
+      starsRating
+      name
+      countReviews
+      description
+      aromNote
+      stocks {
+        pk
+        article
+        volume
+        unit
+        quantity
+        cost
+        discount
+      }
+    }
+  }
+`;
+export const GET_PRODUCT_IMAGES_CLIENT = gql` 
+  query($productId: Int!) {
+    product(id: $productId) {
+      images {
+        asMain
+        imageUrl
+      }
     }
   }
 `;

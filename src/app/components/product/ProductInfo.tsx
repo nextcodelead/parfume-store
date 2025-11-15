@@ -1,59 +1,32 @@
 'use client'
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronRight, Star, Check, Minus, Plus, Heart, Share2, ShoppingCart, Truck, Shield, RotateCcw } from "lucide-react";
 import Button from "../Button";
+import { useProductClient } from "@/app/hooks/useProducts";
 
-interface ProductSize {
-  label: string;
-  value: string;
-  price: number;
-  inStock: boolean;
-}
-
-interface ProductFeature {
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}
-
-interface ProductNotes {
-  top: string[];
-  heart: string[];
-  base: string[];
-}
-
-interface ProductInfoType {
-  id: number;
-  name: string;
-  brand: string;
-  category: string;
-  price: number;
-  oldPrice: number;
-  rating: number;
-  reviews: number;
-  inStock: boolean;
-  sku: string;
-  description: string;
-  images: string[];
-  sizes: ProductSize[];
-  notes: ProductNotes;
-  features?: ProductFeature[];
-}
 
 interface Props {
-  productInfo: ProductInfoType;
+  productId: number;
 }
 
-const ProductInfo: React.FC<Props> = ({ productInfo }) => {
-  const [selectedSize, setSelectedSize] = useState(productInfo.sizes[0]?.value || '');
+const ProductInfo: React.FC<Props> = ({ productId }) => {
+  const {load, data, error, refetch} = useProductClient(productId);
+
+  const [selectedSize, setSelectedSize] = useState<any | null>(null);
+
+  useEffect(() => {
+    const firstStock = data?.product?.stocks?.[0] ?? null;
+    if (firstStock) setSelectedSize(firstStock);
+  }, [data]);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
 
-  const selectedSizeData = productInfo.sizes.find(s => s.value === selectedSize);
-  const discount = productInfo.oldPrice
-    ? Math.round((1 - productInfo.price / productInfo.oldPrice) * 100)
+
+  const discount = selectedSize?.cost
+    ? Math.round((1 - selectedSize.discount / selectedSize.cost) * 100)
     : 0;
+
 
   // Дефолтные фичи если не переданы в props
   const defaultFeatures = [
@@ -62,12 +35,12 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
     { icon: <RotateCcw size={20} />, title: "Easy Returns", text: "30-day return policy" },
   ];
 
-  const features = productInfo.features || defaultFeatures;
+  // const features = productInfo.features || defaultFeatures;
 
-  const handleSizeSelect = (sizeValue: string) => {
-    const size = productInfo.sizes.find(s => s.value === sizeValue);
+  const handleSizeSelect = (pk: string) => {
+    const size = data.product.stocks.find(s => s.pk === pk);
     if (size && size.inStock) {
-      setSelectedSize(sizeValue);
+      setSelectedSize(pk);
     }
   };
 
@@ -81,11 +54,11 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
 
   const handleAddToCart = () => {
     console.log('Adding to cart:', {
-      productId: productInfo.id,
-      name: productInfo.name,
+      productId: data.product.pk,
+      name: data.product.name,
       size: selectedSize,
       quantity: quantity,
-      price: selectedSizeData?.price || productInfo.price
+      price: selectedSizeData?.price || data.product.cost
     });
   };
 
@@ -93,24 +66,39 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
     console.log(`Sharing on ${platform}`);
     setShowShareMenu(false);
   };
-
+  if (error) {
+    return <div className="text-red-600">Error loading product information: {error.message}</div>;
+  }
+  if (load || !data) {
+    return <div>Loading product information...</div>;
+  }
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 flex items-center gap-2">
-        <a href="#" className="hover:text-rose-600 transition-colors">Home</a>
-        <ChevronRight size={16} />
-        <a href="#" className="hover:text-rose-600 transition-colors">Fragrances</a>
-        <ChevronRight size={16} />
-        <a href="#" className="hover:text-rose-600 transition-colors">{productInfo.category}</a>
-        <ChevronRight size={16} />
-        <span className="text-gray-900 font-medium">{productInfo.name}</span>
+        {data.product.categoryRoute.map((cat, index) => (
+          <React.Fragment key={index}>
+            <a
+              href={cat.name}
+              className="hover:text-rose-600 transition-colors"
+            >
+              {cat.name}
+            </a>
+
+            <ChevronRight size={16} />
+          </React.Fragment>
+        ))}
+
+        {/* Конечный элемент — название продукта */}
+        <span className="text-gray-900 font-medium">
+          {data.product.name}
+        </span>
       </nav>
 
       {/* Brand & Name */}
       <div>
-        <p className="text-rose-600 font-semibold mb-1">{productInfo.brand}</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{productInfo.name}</h1>
+        <p className="text-rose-600 font-semibold mb-1">{data.product.brand.name}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{data.product.name}</h1>
         
         {/* Rating & Reviews */}
         <div className="flex items-center gap-4">
@@ -119,16 +107,16 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
               <Star
                 key={i}
                 size={18}
-                className={i < Math.floor(productInfo.rating) 
+                className={i < Math.floor(data.product.starsRating) 
                   ? 'fill-amber-400 text-amber-400' 
                   : 'text-gray-300'
                 }
               />
             ))}
           </div>
-          <span className="text-gray-700 font-medium">{productInfo.rating.toFixed(1)}</span>
+          <span className="text-gray-700 font-medium">{data.product.starsRating.toFixed(1)}</span>
           <a href="#reviews" className="text-rose-600 hover:underline transition-colors">
-            ({productInfo.reviews} reviews)
+            ({data.product.countReviews} reviews)
           </a>
         </div>
       </div>
@@ -136,12 +124,14 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
       {/* Price */}
       <div className="flex items-center gap-3">
         <span className="text-4xl font-bold text-gray-900">
-          ${selectedSizeData?.price.toFixed(2) || productInfo.price.toFixed(2)}
+          {/* ${selectedSize?.discount.toFixed(2)} */}
+          ${selectedSize?.discount}
         </span>
-        {productInfo.oldPrice > 0 && (
+        {selectedSize?.cost > 0 && (
           <>
             <span className="text-2xl text-gray-500 line-through">
-              ${productInfo.oldPrice.toFixed(2)}
+              {/* ${selectedSize?.cost.toFixed(2)} */}
+              ${selectedSize?.cost}
             </span>
             <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full font-semibold text-sm">
               -{discount}%
@@ -152,7 +142,7 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
 
       {/* Stock Status */}
       <div className="flex items-center gap-2">
-        {productInfo.inStock ? (
+        {selectedSize?.quantity > 0 ? (
           <>
             <Check size={20} className="text-green-600" />
             <span className="text-green-600 font-semibold">In Stock</span>
@@ -162,11 +152,11 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
             <span className="text-red-600 font-semibold">Out of Stock</span>
           </>
         )}
-        <span className="text-gray-500 text-sm">SKU: {productInfo.sku}</span>
+        <span className="text-gray-500 text-sm">SKU: {selectedSize?.article}</span>
       </div>
 
       {/* Description */}
-      <p className="text-gray-700 leading-relaxed text-lg">{productInfo.description}</p>
+      <p className="text-gray-700 leading-relaxed text-lg">{data.product.description}</p>
 
       {/* Fragrance Notes */}
       <div className="bg-rose-50 rounded-lg p-4">
@@ -175,58 +165,58 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
           <div>
             <h4 className="text-sm font-medium text-rose-700 mb-2">Top Notes</h4>
             <div className="flex flex-wrap gap-1">
-              {productInfo.notes.top.map((note, index) => (
+              {data.product.aromNote?.split(",").map((note, index) => (
                 <span key={index} className="bg-white px-2 py-1 rounded-full text-xs text-gray-700 border border-rose-200">
                   {note}
                 </span>
               ))}
             </div>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-rose-700 mb-2">Heart Notes</h4>
-            <div className="flex flex-wrap gap-1">
-              {productInfo.notes.heart.map((note, index) => (
-                <span key={index} className="bg-white px-2 py-1 rounded-full text-xs text-gray-700 border border-rose-200">
-                  {note}
-                </span>
-              ))}
+            {/* <div>
+              <h4 className="text-sm font-medium text-rose-700 mb-2">Heart Notes</h4>
+              <div className="flex flex-wrap gap-1">
+                {data.product.notes.heart.map((note, index) => (
+                  <span key={index} className="bg-white px-2 py-1 rounded-full text-xs text-gray-700 border border-rose-200">
+                    {note}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-          <div>
-            <h4 className="text-sm font-medium text-rose-700 mb-2">Base Notes</h4>
-            <div className="flex flex-wrap gap-1">
-              {productInfo.notes.base.map((note, index) => (
-                <span key={index} className="bg-white px-2 py-1 rounded-full text-xs text-gray-700 border border-rose-200">
-                  {note}
-                </span>
-              ))}
-            </div>
-          </div>
+            <div>
+              <h4 className="text-sm font-medium text-rose-700 mb-2">Base Notes</h4>
+              <div className="flex flex-wrap gap-1">
+                {productInfo.notes.base.map((note, index) => (
+                  <span key={index} className="bg-white px-2 py-1 rounded-full text-xs text-gray-700 border border-rose-200">
+                    {note}
+                  </span>
+                ))}
+              </div>
+            </div> */}
         </div>
       </div>
 
       {/* Size Selection */}
-      {productInfo.sizes.length > 0 && (
+      {data.product.stocks.length > 0 && (
         <div>
           <label className="block text-sm font-semibold text-gray-900 mb-3">
             Size
           </label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {productInfo.sizes.map(size => (
+            {data.product.stocks.map(stock => (
               <button
-                key={size.value}
-                onClick={() => handleSizeSelect(size.value)}
-                disabled={!size.inStock}
+                key={stock.pk}
+                onClick={() => handleSizeSelect(stock.pk)}
+                disabled={stock.quantity === 0}
                 className={`py-3 px-2 rounded-lg border-2 font-semibold transition-all ${
-                  selectedSize === size.value
+                  selectedSize === stock.pk
                     ? 'border-rose-600 bg-rose-50 text-rose-600'
-                    : size.inStock
+                    : stock.quantity > 0
                     ? 'border-gray-300 hover:border-gray-400 text-gray-900'
                     : 'border-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {size.label}
-                {!size.inStock && (
+                {stock.quantity} {stock.unit}
+                {stock.quantity === 0 && (
                   <span className="block text-xs font-normal mt-1">Out of Stock</span>
                 )}
               </button>
@@ -271,10 +261,10 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
           size="lg"
           fullWidth
           onClick={handleAddToCart}
-          disabled={!productInfo.inStock}
+          disabled={!(selectedSize && selectedSize.quantity > 0)}
           leftIcon={<ShoppingCart size={20} />}
         >
-          {productInfo.inStock ? 'Add to Cart' : 'Out of Stock'}
+          {selectedSize && selectedSize.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
         </Button>
         <Button
           variant="outline"
@@ -322,7 +312,7 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
       </div>
 
       {/* Features */}
-      {features.length > 0 && (
+      {/* {features.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-gray-200">
           {features.map((feature, idx) => (
             <div key={idx} className="text-center flex flex-col items-center">
@@ -334,7 +324,7 @@ const ProductInfo: React.FC<Props> = ({ productInfo }) => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

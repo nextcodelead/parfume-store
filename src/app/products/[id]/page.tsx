@@ -15,12 +15,11 @@ interface PageProps {
 
 export default function ProductPage({ params }: PageProps) {
   // Находим продукт по ID
-  const product = PRODUCT_DATA.find(p => p.id === parseInt(params.id));
   
   // Если продукт не найден, показываем 404
-  if (!product) {
-    notFound();
-  }
+  // if (!product) {
+  //   notFound();
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,15 +28,15 @@ export default function ProductPage({ params }: PageProps) {
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div>
-            <ProductImageGallery images={product.images} />
+            <ProductImageGallery productId={parseInt(params.id)} />
           </div>
           <div>
-            <ProductInfo productInfo={product} />
+            <ProductInfo productId={parseInt(params.id)} />
           </div>
         </div>
         <div className="space-y-12">
           <section>
-            <FragranceNotes notes={product.notes} />
+            {/* <FragranceNotes notes={product.notes} /> */}
           </section>
           <section>
             <ReviewsSection/>

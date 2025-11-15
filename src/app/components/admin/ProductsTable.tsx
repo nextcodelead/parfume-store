@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Plus, Eye, Edit, Trash2, Download, Upload } from 'lucide-react';
+import { Search, Plus, Eye, Edit, Trash2, Download, Upload, Settings } from 'lucide-react';
 import { ProductFormData } from '../../types/product';
 import Button from '../Button';
 import AddProductModal from './AddProductModal';
 import { useAdminProducts, useAdminProductsCount } from '@/app/hooks/useCategories';
 import UploadImageModal from './UploadImageModal';
 import { useDeleteProduct } from '@/app/hooks/useProducts';
+import UpdateStockModal from './UpdateStockModal';
+
 
 
 const ProductsTable: React.FC = () => {
@@ -15,6 +17,7 @@ const ProductsTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUpdateStockModalOpen, setIsUpdateStockModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [isUploadImageModalOpen, setIsUploadImageModalOpen] = useState(false);
   const { data, loading, error, refetch } = useAdminProducts(searchTerm, currentPage);
@@ -33,8 +36,8 @@ const ProductsTable: React.FC = () => {
       OUT_OF_STOCK: 'bg-red-100 text-red-700'
     };
     const labels = {
-      active: 'Активен',
-      draft: 'Черновик',
+      ACTIVE: 'Активен',
+      DRAFT: 'Черновик',
       OUT_OF_STOCK: 'Нет в наличии'
     };
     return (
@@ -95,7 +98,6 @@ const ProductsTable: React.FC = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Товар</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Категория</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Цена</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Остаток</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Продажи</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Статус</th>
@@ -121,7 +123,6 @@ const ProductsTable: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-gray-700">{product.category.name}</td>
-                <td className="px-6 py-4 font-semibold text-gray-900">₽{product.cost.toFixed(2)}</td>
                 <td className="px-6 py-4">
                   <span className={`font-semibold ${product.count === 0 ? 'text-red-600' : product.count < 20 ? 'text-orange-600' : 'text-green-600'}`}>
                     {product.count}
@@ -136,6 +137,12 @@ const ProductsTable: React.FC = () => {
                       setIsUploadImageModalOpen(true);
                     }}>
                       <Upload size={18} />
+                    </button>
+                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" onClick={() => {
+                      setSelectedProductId(product.pk);
+                      setIsUpdateStockModalOpen(true);
+                    }}>
+                      <Settings size={18} />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye size={18} />
@@ -200,6 +207,11 @@ const ProductsTable: React.FC = () => {
       <UploadImageModal
         isOpen={isUploadImageModalOpen}
         onClose={() => setIsUploadImageModalOpen(false)}
+        productId={selectedProductId}
+      />
+      <UpdateStockModal
+        isOpen={isUpdateStockModalOpen && selectedProductId !== null}
+        onClose={() => setSelectedProductId(null)}
         productId={selectedProductId}
       />
     </div>
