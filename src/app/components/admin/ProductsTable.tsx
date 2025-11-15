@@ -210,9 +210,9 @@ const ProductsTable: React.FC = () => {
         productId={selectedProductId}
       />
       <UpdateStockModal
-        isOpen={isUpdateStockModalOpen && selectedProductId !== null}
-        onClose={() => setSelectedProductId(null)}
-        productId={selectedProductId}
+        isOpen={isUpdateStockModalOpen}
+        onClose={() => { setIsUpdateStockModalOpen(false); setSelectedProductId(null); }}
+        productId={selectedProductId!}
       />
     </div>
   );
