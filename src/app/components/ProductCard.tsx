@@ -54,10 +54,6 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false }) => {
 
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
 
-      {/* <div className="flex items-center gap-1 mb-2">
-        <Star size={16} className="fill-amber-400 text-amber-400" />
-      </div> */}
-
       <div className="flex items-center justify-between mb-3">
         {showDiscount && product.discount && product.cost ? (
           <div className="flex items-center gap-2">
