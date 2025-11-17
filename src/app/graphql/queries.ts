@@ -8,9 +8,6 @@ export const GET_PRODUCTS = gql`
     products(filters: $filters, pagination: $pagination) {
       pk
       name
-      article
-      cost
-      discount
       photo {
         imageUrl
       }
@@ -23,6 +20,10 @@ export const GET_PRODUCTS = gql`
       category {
         pk
         name
+      }
+      stocks {
+        discount
+        cost
       }
     }
   }

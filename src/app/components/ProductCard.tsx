@@ -21,8 +21,8 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   
   // Используем price как текущую цену, oldPrice только для отображения
-  const displayPrice = product.discount ?? 0;
-  const displayOldPrice = product.cost ?? 0;
+  const displayPrice = product.stocks[0]?.discount ?? 0;
+  const displayOldPrice = product.stocks[0]?.cost ?? 0;
 
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4 relative group">
@@ -30,7 +30,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false }) => {
       {/* Обложка карточки */}
       <div className="w-full h-56 overflow-hidden rounded-md mb-4">
         <img 
-          src={product.photo?.imageUrl || "https://via.placeholder.com/300x300?text=No+Image"}
+          src={product.photo ? `https://dataset.uz/${product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
         />
