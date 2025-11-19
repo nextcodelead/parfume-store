@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Users, TrendingUp, Settings } from 'lucide-react';
 import Sidebar from '../components/admin/Sidebar';
 import Header from '../components/admin/Header';
-import DashboardContent from '../components/admin/DashboardContent';
+// import DashboardContent from '../components/admin/DashboardContent';
 import ProductsTable from '../components/admin/ProductsTable';
 import OrdersTable from '../components/admin/OrdersTable';
 import ComingSoon from '../components/admin/ComingSoon';
@@ -15,7 +15,7 @@ const AdminPanel: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardContent />;
+        // return <DashboardContent />;
       
       case 'products':
         return <ProductsTable />;

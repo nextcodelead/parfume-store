@@ -22,11 +22,12 @@ export const useProducts = () => {
     errorPolicy: 'all',
   });
 };
-export const useProductImages = (productId: number) => {
+export const useProductImages = (productId: number | null) => {
   return useQuery(GET_PRODUCT_IMAGES, {
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
-    variables: { filters: { productId: { equals: productId } } },
+    skip: productId == null,
+    variables: productId == null ? undefined : { filters: { productId: { equals: productId } } },
   });
 };
 export const useProductStocks = (productId: number) => {
