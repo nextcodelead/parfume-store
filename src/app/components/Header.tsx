@@ -120,8 +120,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }
                   Каталог
                 </button>
               </li>
-              <li><Link href="/#new" className="hover:text-rose-600">Новинки</Link></li>
-              <li><Link href="/#sale" className="hover:text-rose-600">Скидки</Link></li>
+              <li><Link href="#new" className="hover:text-rose-600">Новинки</Link></li>
+              <li><Link href="#sale" className="hover:text-rose-600">Акции</Link></li>
               <li><Link href="/#about" className="hover:text-rose-600">О нас</Link></li>
             </ul>
           </nav>

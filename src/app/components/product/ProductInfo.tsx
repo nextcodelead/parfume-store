@@ -37,10 +37,10 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
 
   // const features = productInfo.features || defaultFeatures;
 
-  const handleSizeSelect = (pk: string) => {
+  const handleSizeSelect = (pk: number) => {
     const size = data.product.stocks.find(s => s.pk === pk);
-    if (size && size.inStock) {
-      setSelectedSize(pk);
+    if (size) {
+      setSelectedSize(size);
     }
   };
 
@@ -58,7 +58,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
       name: data.product.name,
       size: selectedSize,
       quantity: quantity,
-      price: selectedSizeData?.price || data.product.cost
+      price: selectedSize?.discount ?? selectedSize?.cost ?? data.product.cost ?? 0
     });
   };
 
@@ -101,7 +101,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{data.product.name}</h1>
         
         {/* Rating & Reviews */}
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -118,7 +118,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
           <a href="#reviews" className="text-rose-600 hover:underline transition-colors">
             ({data.product.countReviews} reviews)
           </a>
-        </div>
+        </div> */}
       </div>
 
       {/* Price */}
@@ -208,7 +208,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
                 onClick={() => handleSizeSelect(stock.pk)}
                 disabled={stock.quantity === 0}
                 className={`py-3 px-2 rounded-lg border-2 font-semibold transition-all ${
-                  selectedSize === stock.pk
+                  selectedSize?.pk === stock.pk
                     ? 'border-rose-600 bg-rose-50 text-rose-600'
                     : stock.quantity > 0
                     ? 'border-gray-300 hover:border-gray-400 text-gray-900'
@@ -264,7 +264,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
           disabled={!(selectedSize && selectedSize.quantity > 0)}
           leftIcon={<ShoppingCart size={20} />}
         >
-          {selectedSize && selectedSize.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+          {selectedSize && selectedSize.quantity > 0 ? 'Добавить в корзину' : 'Out of Stock'}
         </Button>
         <Button
           variant="outline"

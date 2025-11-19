@@ -5,6 +5,10 @@ export interface Product {
   name: string;
   cost: number; // ← использовать cost вместо price
   discount?: number;
+  stocks?: {
+    cost?: number;
+    discount?: number;
+  }[];
   photo: {
     imageUrl: string;
   } | null;

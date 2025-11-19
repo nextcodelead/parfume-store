@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useProducts } from '../hooks/useProducts';
 
 type Stock = {
@@ -74,58 +75,69 @@ export default function ProductList() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product) => (
-          <div key={product.pk} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="aspect-square bg-gray-100 flex items-center justify-center">
-              {product.photo?.imageUrl ? (
-                <img 
-                  src={product.photo.imageUrl} 
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="text-4xl">🌸</div>
-              )}
-            </div>
-            
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-500">Артикул: {product.article}</span>
-                <span className="text-lg font-bold text-pink-600">
-                  {product.cost} ₽
-                </span>
+          <div 
+            key={product.pk} 
+            className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow focus-within:ring-2 focus-within:ring-pink-500"
+          >
+            <Link 
+              href={`/products/${product.pk}`} 
+              className="absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              aria-label={`Перейти к товару ${product.name}`}
+            />
+            <div className="relative z-20">
+              <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                {product.photo?.imageUrl ? (
+                  <img 
+                    src={product.photo.imageUrl} 
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-4xl">🌸</div>
+                )}
               </div>
               
-              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                {product.name}
-              </h3>
-              
-              {product.stocks && product.stocks.length > 0 && (
-                <div className="mb-3">
-                  <p className="text-sm text-gray-600 mb-1">Доступные размеры:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {product.stocks.map((stock, index) => (
-                      <span key={index} className={`px-2 py-1 text-xs rounded-full ${
-                        stock.quantity > 0 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {stock.size}: {stock.quantity}
-                      </span>
-                    ))}
+              <div className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Артикул: {product.article}</span>
+                  <span className="text-lg font-bold text-pink-600">
+                    {product.cost} ₽
+                  </span>
+                </div>
+                
+                <h3 className="font-semibold text-gray-900 line-clamp-2">
+                  {product.name}
+                </h3>
+                
+                {product.stocks && product.stocks.length > 0 && (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Доступные размеры:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {product.stocks.map((stock, index) => (
+                        <span key={index} className={`px-2 py-1 text-xs rounded-full ${
+                          stock.quantity > 0 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {stock.size}: {stock.quantity}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+                )}
+                
+                <div className="flex items-center justify-between pt-2">
+                  <div className="text-sm text-gray-600">
+                    {product.brand?.name}
+                  </div>
+                  <button 
+                    className="relative z-30 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50"
+                    disabled={!product.stocks?.some(stock => stock.quantity > 0)}
+                    type="button"
+                  >
+                    {product.stocks?.some(stock => stock.quantity > 0) ? 'В корзину' : 'Нет в наличии'}
+                  </button>
                 </div>
-              )}
-              
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  {product.brand?.name}
-                </div>
-                <button 
-                  className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50"
-                  disabled={!product.stocks?.some(stock => stock.quantity > 0)}
-                >
-                  {product.stocks?.some(stock => stock.quantity > 0) ? 'В корзину' : 'Нет в наличии'}
-                </button>
               </div>
             </div>
           </div>
