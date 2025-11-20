@@ -4,8 +4,8 @@ import { gql } from '@apollo/client';
 
 // Запрос для получения конкретного продукта (ИСПРАВЛЕННЫЙ)
 export const GET_PRODUCTS = gql`
-  query GetProducts($filters: ProductFilter, $pagination: PaginationInput) {
-    products(filters: $filters, pagination: $pagination) {
+  query GetProducts($filters: ProductFilter, $pagination: PaginationInput, $ordering: ProductOrder) {
+    products(filters: $filters, pagination: $pagination, ordering: $ordering) {
       pk
       name
       photo {
@@ -94,8 +94,8 @@ export const GET_PRODUCTS_COUNT_ADMIN = gql`
 `;
 
 export const ADMIN_CREATE_PRODUCT_SELECT_CATEGORY = gql`
-  query categories {
-    categories {
+  query categories($filter: CategoryFilter) {
+    categories(filters: $filter) {
       pk
       name
     }

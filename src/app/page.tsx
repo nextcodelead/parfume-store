@@ -3,13 +3,14 @@ import React from 'react';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import Header from './components/Header';
-import { useAllProducts } from './hooks/useAllProducts';
+import { useAllProducts, useNewProducts } from './hooks/useAllProducts';
 import Link from "next/link";
 
 const App: React.FC = () => {
   const { data, loading, error } = useAllProducts();
+  const { data: newProductsData, loading: newLoading, error: newError } = useNewProducts();
   const allProducts = data?.products || [];
-  const newArrivals = allProducts.slice(0, 4);
+  const newArrivals = newProductsData?.products || [];
   const promoProducts = allProducts
     .filter((product) =>
       product.stocks?.some(
@@ -41,9 +42,9 @@ const App: React.FC = () => {
             <span className="text-gray-500 text-sm">Первые поступления</span>
           </div>
 
-          {loading ? (
+          {newLoading ? (
             <div>Loading...</div>
-          ) : error ? (
+          ) : newError ? (
             <div>Error loading products</div>
           ) : newArrivals.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

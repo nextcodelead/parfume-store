@@ -21,7 +21,13 @@ export const useCategories = () => {
 export const useSelectCategories = () => {
   const isClient = useIsClient();
   return useQuery(ADMIN_CREATE_PRODUCT_SELECT_CATEGORY, {
-    variables: {},
+    variables: {
+      "filter": {
+        "parentId": {
+          "notEquals": null
+        }
+      }
+    },
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
     skip: !isClient,

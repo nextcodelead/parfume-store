@@ -8,8 +8,36 @@ export const useAllProducts = () => {
   
   return useQuery(GET_PRODUCTS, {
     variables: {
-      filters: {}, // ← без фильтров, все товары
+      filters: {
+        isPublished: {
+          equals: true
+        },
+        showAtMain: {
+          equals: true
+        }
+      }, 
       pagination: { limit: 20 }
+    },
+    skip: !isClient
+  });
+};
+export const useNewProducts = () => {
+  const isClient = useIsClient();
+  
+  return useQuery(GET_PRODUCTS, {
+    variables: {
+      filters: {
+        isPublished: {
+          equals: true
+        },
+        showAtMain: {
+          equals: true
+        }
+      },
+      pagination: { limit: 4 },
+      ordering: {
+        createdAt: "DESC"
+      }
     },
     skip: !isClient
   });
