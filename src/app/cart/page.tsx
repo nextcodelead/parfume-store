@@ -1,31 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import { CartItem } from "../components/cart/CartItem";
 import { CartSummary } from "../components/cart/CartSummary";
-import { CART_ITEMS } from "../data/cartProductsData";
 import EmptyState from "../components/EmptyState";
 import Button from "../components/Button";
 import { Trash2, ChevronRight } from "lucide-react";
+import { useRemoveAllFromCart, useRemoveProductFromCart } from "../hooks/useUserCart";
+import { useMeUserCart } from "../hooks/useMe";
+import { Stock } from "../components/CategoriesMenu/StockSelect";
 
 export default function CartPage() {
-  const [items, setItems] = useState(CART_ITEMS);
+  const [removeAllFromCart, {loading: removeLoading, error: removeError}] = useRemoveAllFromCart();
+  const [removeProductFromCart, {loading: removeProductLoading, error: removeProductError}] = useRemoveProductFromCart();
+  const {loading, data, error, refetch} = useMeUserCart();
   const router = useRouter();
+  const [carts, setCarts] = useState<typeof data.me.userCart>([]);
 
-  const handleUpdateQuantity = (id: number, quantity: number) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
-    );
-  };
+  // инициализируем, когда данные придут
+  useEffect(() => {
+    if (data?.me?.userCart) {
+      setCarts(data.me.userCart);
+    }
+  }, [data?.me?.userCart]);
 
-  const handleRemove = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
 
-  if (items.length === 0) {
+  if (!data || loading) {
+    return <div>Loading...</div>;
+  }
+  if( error ) {
+    return <div>Error loading cart data</div>;
+  }
+  if (carts.length === 0) {
     return <EmptyState type="cart" />;
+  }
+
+  const handleRemove = async (pk: number) => {
+    try{
+      setCarts((prev) => prev.filter(item => item.pk !== pk));
+      await removeProductFromCart({variables: {pk: pk}})
+      await refetch();
+    } catch(err) {
+      console.error("Failed to remove product from cart:", err);
+    }
   }
 
   return (
@@ -36,10 +55,10 @@ export default function CartPage() {
         <div className="md:col-span-2 space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-900">
-              Корзина ({items.length} товаров)
+              Корзина ({carts.length} товаров)
             </h1>
             <button
-              onClick={() => setItems([])}
+              onClick={async () => { await removeAllFromCart(); await refetch(); }}
               className="text-red-600 hover:text-red-700 text-sm font-semibold flex items-center gap-1"
             >
               <Trash2 size={16} />
@@ -47,15 +66,24 @@ export default function CartPage() {
             </button>
           </div>
 
-          {items.map((item) => (
-            <CartItem
-              key={item.id}
-              item={item}
-              onUpdateQuantity={handleUpdateQuantity}
-              onRemove={handleRemove}
+          {carts.map((item) => (
+              <CartItem
+                key={item.pk}
+                cart={item}
+                onUpdateQuantity={(pk, quantity) => {
+                  setCarts((prev) =>
+                    prev.map(i => i.pk === pk ? { ...i, count: quantity } : i)
+                  );
+                  console.log("Update quantity for pk:", pk, "to", quantity);
+                }}
+                onSetStock={(stockId: number, stock: Stock) => {
+                  setCarts((prev) =>
+                    prev.map(i => i.pk === stockId ? { ...i, stock } : i)
+                  );                  
+                }}
+                onRemove={handleRemove}
             />
           ))}
-
           {/* Продолжить покупки */}
           <Button
             variant="outline"
@@ -68,7 +96,7 @@ export default function CartPage() {
 
         {/* Итог корзины */}
         <div className="md:col-span-1">
-          <CartSummary items={items} />
+          <CartSummary items={carts} />
         </div>
       </div>
     </>

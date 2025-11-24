@@ -12,21 +12,20 @@ export const ADMIN_ADD_PRODUCT = gql`
 `;
 
 export const ADD_PRODUCT_TO_USER_CART = gql`
-  mutation AddProductToUserCart($productId: ID!, $quantity: Int!) {
-    addProductToUserCart(productId: $productId, quantity: $quantity) {
-      success
-      message
-      cartItem {
-        id
-        quantity
-        product {
-          id
-          name
-          price
-          image
-        }
-      }
+  mutation addProductToUserCart($productId: Int!, $count: Int!) {
+    addProductToUserCart(productId: $productId, count: $count) {
+      pk
     }
+  }
+`;
+export const REMOVE_ALL_PRODUCTS_FROM_USER_CART = gql`
+  mutation removeAllProductsFromUserCart {
+    removeAllProductsFromUserCart
+  }
+`;
+export const REMOVE_PRODUCT_FROM_USER_CART = gql`
+  mutation removeProductFromUserCart($pk: Int!) {
+    removeProductFromUserCart(pk: $pk)
   }
 `;
 

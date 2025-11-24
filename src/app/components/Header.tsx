@@ -6,6 +6,7 @@ import { WISHLIST_ITEMS } from "../data/wishListData";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { CategoriesMenu } from '../components/CategoriesMenu/CategoriesMenu'; // Импорт компонента категорий
+import { useMeMain } from '../hooks/useMe';
 
 interface SiteConfig {
   brandName: string;
@@ -36,6 +37,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }) => {
+  const { data, loading, error } = useMeMain();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false); // Состояние для меню категорий
   const router = useRouter();
@@ -94,11 +96,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }
                 className={`hover:text-rose-600 relative ${activeTab === 'cart' ? 'text-rose-600' : ''}`}
               >
                 <ShoppingCart size={24} />
-                {CART_ITEMS.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-rose-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {CART_ITEMS.length}
-                  </span>
-                )}
+                <span className="absolute -top-2 -right-2 bg-rose-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {data?.me?.countProductInUserCart || 0}
+                </span>
               </button>
 
               {/* Меню (мобилка) */}

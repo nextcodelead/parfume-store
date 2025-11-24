@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { Product } from '../types/graphql';
+import { useAddToCart } from '../hooks/useUserCart';
 
 type ProductWithStocks = Product & {
   stocks?: {
@@ -14,6 +15,7 @@ type ProductWithStocks = Product & {
 interface Props {
   product: ProductWithStocks;
   showDiscount?: boolean;
+  onAddedToCart?: () => void;
 }
 
 const COLORS = {
@@ -24,8 +26,9 @@ const SITE_CONFIG = {
   currency: "$"
 };
 
-const ProductCard: React.FC<Props> = ({ product, showDiscount = false }) => {
+const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedToCart }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const { addToCart, loading: addingToCart } = useAddToCart();
   if (!product) return null;
   
   // Используем price как текущую цену, oldPrice только для отображения
@@ -91,14 +94,16 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false }) => {
           </div>
         </div>
         
+        {!product.isInMyCart && (
         <div className="pt-2">
           <button 
             className={`relative z-40 w-full ${COLORS.primary} text-white py-2 rounded-lg transition-colors`}
-            type="button"
+            type="button" onClick={async () => { await addToCart(product.pk, 1); onAddedToCart?.(); }}
           >
             Добавить в корзину
           </button>
         </div>
+        )}
       </div>
     </div>
   );

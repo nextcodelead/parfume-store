@@ -13,6 +13,7 @@ export const GET_PRODUCTS = gql`
       }
       description
       isPublished
+      isInMyCart
       brand {
         pk
         name
@@ -229,6 +230,48 @@ export const GET_PRODUCT_IMAGES_CLIENT = gql`
         asMain
         imageUrl
       }
+    }
+  }
+`;
+
+export const ME_MAIN = gql`
+  query countProductInUserCart{
+    me {
+      countProductInUserCart
+    }
+  }
+`;
+export const ME_USER_CART = gql`
+    query meUserCart {
+      me {
+        userCart {
+          pk
+          product {
+            pk
+            name
+            brand {
+              name
+            }
+            photo {
+              imageUrl
+            }
+            stocksCount
+          }
+          count
+        }
+      }
+    }
+`;
+
+export const STOCKS = gql`
+  query stocks($filters: StockFilter) {
+    stocks(filters: $filters) {
+      pk
+      cost
+      discount
+      quantity
+      size
+      unit
     }
   }
 `;

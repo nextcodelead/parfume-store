@@ -7,8 +7,8 @@ import { useAllProducts, useNewProducts } from './hooks/useAllProducts';
 import Link from "next/link";
 
 const App: React.FC = () => {
-  const { data, loading, error } = useAllProducts();
-  const { data: newProductsData, loading: newLoading, error: newError } = useNewProducts();
+  const { data, loading, error, refetch: refetchAllProducts } = useAllProducts();
+  const { data: newProductsData, loading: newLoading, error: newError, refetch: refetchNewProducts } = useNewProducts();
   const allProducts = data?.products || [];
   const newArrivals = newProductsData?.products || [];
   const promoProducts = allProducts
@@ -54,7 +54,7 @@ const App: React.FC = () => {
                   href={`/products/${product.pk}`}
                   className="block"
                 >
-                  <ProductCard product={transformProductForCard(product)} />
+                  <ProductCard product={transformProductForCard(product)} onAddedToCart={() => { refetchNewProducts();  }} />
                 </Link>
               ))}
             </div>
@@ -125,3 +125,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+

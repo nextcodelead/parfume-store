@@ -5,7 +5,7 @@ import { SHIPPING_OPTIONS } from "../../data/shippingOptions";
 import { CartItemType } from "../../data/cartProductsData";
 import Link from "next/link";
 type CartSummaryProps = {
-  items: CartItemType[];
+  items: [];
 };
 
 export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
@@ -13,7 +13,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   const [selectedShipping, setSelectedShipping] = useState("standard");
   const [discount, setDiscount] = useState(0);
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.stock?.cost ?? 0) * item.count, 0);
   const shipping = SHIPPING_OPTIONS.find((s) => s.id === selectedShipping)?.price || 0;
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax - discount;

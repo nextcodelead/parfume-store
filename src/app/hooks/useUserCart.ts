@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_USER_CART } from '../graphql/queries';
-import { ADD_PRODUCT_TO_USER_CART } from '../graphql/mutations';
+import { ADD_PRODUCT_TO_USER_CART, REMOVE_ALL_PRODUCTS_FROM_USER_CART, REMOVE_PRODUCT_FROM_USER_CART } from '../graphql/mutations';
 import { useIsClient } from './useIsClient';
 
 // Хук для получения корзины пользователя
@@ -14,6 +14,13 @@ export const useUserCart = () => {
   });
 };
 
+
+export const useRemoveAllFromCart = () => {
+  return useMutation(REMOVE_ALL_PRODUCTS_FROM_USER_CART, { errorPolicy: "all" });
+};
+export const useRemoveProductFromCart = () => {
+  return useMutation(REMOVE_PRODUCT_FROM_USER_CART, { errorPolicy: "all" });
+};
 // Хук для добавления продукта в корзину
 export const useAddToCart = () => {
   const [addToCartMutation, { loading, error }] = useMutation(ADD_PRODUCT_TO_USER_CART, {
@@ -21,10 +28,10 @@ export const useAddToCart = () => {
     errorPolicy: 'all',
   });
 
-  const addToCart = async (productId: string, quantity: number = 1) => {
+  const addToCart = async (productId: number, count: number = 1) => {
     try {
       const result = await addToCartMutation({
-        variables: { productId, quantity },
+        variables: { productId, count },
       });
       return result.data?.addProductToUserCart;
     } catch (err) {
