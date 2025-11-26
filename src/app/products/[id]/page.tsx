@@ -1,25 +1,29 @@
 import ProductImageGallery from "../../components/product/ProductImageGallery";
 import ProductInfo from "../../components/product/ProductInfo";
-import FragranceNotes from "../../components/product/FragranceNotes";
-import ReviewsSection from "../../components/product/ReviewsSection";
-import { PRODUCT_DATA, REVIEWS_DATA } from "../../data/productsData";
-import { notFound } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function ProductPage({ params }: PageProps) {
-  // Находим продукт по ID
-  
-  // Если продукт не найден, показываем 404
-  // if (!product) {
-  //   notFound();
-  // }
+export default async function ProductPage({ params }: PageProps) {
+  const { id } = await params;
+  const productId = parseInt(id);
+
+  if (isNaN(productId)) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 py-8">
+          <div className="text-center text-red-600">Неверный ID продукта</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,15 +32,15 @@ export default function ProductPage({ params }: PageProps) {
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div>
-            <ProductImageGallery productId={parseInt(params.id)} />
+            <ProductImageGallery productId={productId} />
           </div>
           <div>
-            <ProductInfo productId={parseInt(params.id)} />
+            <ProductInfo productId={productId} />
           </div>
         </div>
         <div className="space-y-12">
           <section>
-            {/* <FragranceNotes notes={product.notes} /> */}
+            {/* Дополнительные секции можно добавить здесь */}
           </section>
         </div>
       </main>
