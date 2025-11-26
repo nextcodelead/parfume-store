@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import { UPDATE_ME, UPDATE_USER } from '../graphql/mutations';
 import { GET_ME } from '../graphql/queries';
-import { UpdateUserInput } from '../types/graphql';
+import { UpdateUserInput, UpdateMeResponse, UpdateUserResponse } from '../types/graphql';
 import { useIsClient } from './useIsClient';
 
 // Хук для получения данных текущего пользователя
@@ -16,7 +16,7 @@ export const useMe = () => {
 
 // Хук для обновления данных текущего пользователя
 export const useUpdateMe = () => {
-  const [updateMeMutation, { loading, error }] = useMutation(UPDATE_ME, {
+  const [updateMeMutation, { loading, error }] = useMutation<UpdateMeResponse>(UPDATE_ME, {
     refetchQueries: [GET_ME],
     errorPolicy: 'all',
   });
@@ -26,7 +26,7 @@ export const useUpdateMe = () => {
       const result = await updateMeMutation({
         variables: { input },
       });
-      return (result.data as any)?.updateMe || null;
+      return result.data?.updateMe || null;
     } catch (err) {
       console.error('Error updating user:', err);
       throw err;
@@ -42,7 +42,7 @@ export const useUpdateMe = () => {
 
 // Хук для обновления пользователя (админ)
 export const useUpdateUser = () => {
-  const [updateUserMutation, { loading, error }] = useMutation(UPDATE_USER, {
+  const [updateUserMutation, { loading, error }] = useMutation<UpdateUserResponse>(UPDATE_USER, {
     errorPolicy: 'all',
   });
 
@@ -51,7 +51,7 @@ export const useUpdateUser = () => {
       const result = await updateUserMutation({
         variables: { id, input },
       });
-      return (result.data as any)?.updateUser || null;
+      return result.data?.updateUser || null;
     } catch (err) {
       console.error('Error updating user:', err);
       throw err;
@@ -64,5 +64,3 @@ export const useUpdateUser = () => {
     error,
   };
 };
-
-// Типы импортированы из ../types/graphql

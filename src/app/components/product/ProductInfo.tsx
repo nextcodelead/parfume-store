@@ -1,8 +1,9 @@
 'use client'
 import React, { useEffect, useState } from "react";
-import { ChevronRight, Star, Check, Minus, Plus, Heart, Share2, ShoppingCart, Truck, Shield, RotateCcw } from "lucide-react";
+import { ChevronRight, Check, Minus, Plus, Heart, Share2, ShoppingCart } from "lucide-react";
 import Button from "../Button";
 import { useProductClient } from "@/app/hooks/useProducts";
+import { Stock, ProductClientResponse } from "@/app/types/graphql";
 
 
 interface Props {
@@ -10,14 +11,16 @@ interface Props {
 }
 
 const ProductInfo: React.FC<Props> = ({ productId }) => {
-  const {load, data, error, refetch} = useProductClient(productId);
+  const { loading, data, error } = useProductClient(productId);
 
-  const [selectedSize, setSelectedSize] = useState<any | null>(null);
+  const [selectedSize, setSelectedSize] = useState<Stock | null>(null);
+
+  const productData = data as ProductClientResponse | undefined;
 
   useEffect(() => {
-    const firstStock = data?.product?.stocks?.[0] ?? null;
+    const firstStock = productData?.product?.stocks?.[0] ?? null;
     if (firstStock) setSelectedSize(firstStock);
-  }, [data]);
+  }, [productData]);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -27,18 +30,9 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
     ? Math.round((1 - selectedSize.discount / selectedSize.cost) * 100)
     : 0;
 
-
-  // Дефолтные фичи если не переданы в props
-  const defaultFeatures = [
-    { icon: <Truck size={20} />, title: "Free Shipping", text: "On orders over $100" },
-    { icon: <Shield size={20} />, title: "Authentic Product", text: "100% Original Guarantee" },
-    { icon: <RotateCcw size={20} />, title: "Easy Returns", text: "30-day return policy" },
-  ];
-
-  // const features = productInfo.features || defaultFeatures;
-
   const handleSizeSelect = (pk: number) => {
-    const size = data.product.stocks.find(s => s.pk === pk);
+    if (!productData?.product) return;
+    const size = productData.product.stocks.find((s: Stock) => s.pk === pk);
     if (size) {
       setSelectedSize(size);
     }
@@ -53,12 +47,13 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
   };
 
   const handleAddToCart = () => {
+    if (!productData?.product) return;
     console.log('Adding to cart:', {
-      productId: data.product.pk,
-      name: data.product.name,
+      productId: productData.product.pk,
+      name: productData.product.name,
       size: selectedSize,
       quantity: quantity,
-      price: selectedSize?.discount ?? selectedSize?.cost ?? data.product.cost ?? 0
+      price: selectedSize?.discount ?? selectedSize?.cost ?? 0
     });
   };
 
@@ -69,14 +64,14 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
   if (error) {
     return <div className="text-red-600">Error loading product information: {error.message}</div>;
   }
-  if (load || !data) {
+  if (loading || !productData) {
     return <div>Loading product information...</div>;
   }
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-600 flex items-center gap-2">
-        {data.product.categoryRoute.map((cat, index) => (
+        {productData.product.categoryRoute.map((cat: { name: string }, index: number) => (
           <React.Fragment key={index}>
             <a
               href={cat.name}
@@ -91,14 +86,14 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
 
         {/* Конечный элемент — название продукта */}
         <span className="text-gray-900 font-medium">
-          {data.product.name}
+          {productData.product.name}
         </span>
       </nav>
 
       {/* Brand & Name */}
       <div>
-        <p className="text-rose-600 font-semibold mb-1">{data.product.brand.name}</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{data.product.name}</h1>
+        <p className="text-rose-600 font-semibold mb-1">{productData.product.brand.name}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{productData.product.name}</h1>
         
         {/* Rating & Reviews */}
         {/* <div className="flex items-center gap-4">
@@ -127,7 +122,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
           {/* ${selectedSize?.discount.toFixed(2)} */}
           ${selectedSize?.discount}
         </span>
-        {selectedSize?.cost > 0 && (
+        {selectedSize?.cost && selectedSize.cost > 0 && (
           <>
             <span className="text-2xl text-gray-500 line-through">
               {/* ${selectedSize?.cost.toFixed(2)} */}
@@ -142,7 +137,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
 
       {/* Stock Status */}
       <div className="flex items-center gap-2">
-        {selectedSize?.quantity > 0 ? (
+        {selectedSize && selectedSize.quantity > 0 ? (
           <>
             <Check size={20} className="text-green-600" />
             <span className="text-green-600 font-semibold">In Stock</span>
@@ -156,7 +151,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
       </div>
 
       {/* Description */}
-      <p className="text-gray-700 leading-relaxed text-lg">{data.product.description}</p>
+      <p className="text-gray-700 leading-relaxed text-lg">{productData.product.description}</p>
 
       {/* Fragrance Notes */}
       <div className="bg-rose-50 rounded-lg p-4">
@@ -165,7 +160,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
           <div>
             <h4 className="text-sm font-medium text-rose-700 mb-2">Top Notes</h4>
             <div className="flex flex-wrap gap-1">
-              {data.product.aromNote?.split(",").map((note, index) => (
+              {productData.product.aromNote?.split(",").map((note: string, index: number) => (
                 <span key={index} className="bg-white px-2 py-1 rounded-full text-xs text-gray-700 border border-rose-200">
                   {note}
                 </span>
@@ -196,13 +191,13 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
       </div>
 
       {/* Size Selection */}
-      {data.product.stocks.length > 0 && (
+      {productData.product.stocks.length > 0 && (
         <div>
           <label className="block text-sm font-semibold text-gray-900 mb-3">
             Size
           </label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {data.product.stocks.map(stock => (
+            {productData.product.stocks.map((stock: Stock) => (
               <button
                 key={stock.pk}
                 onClick={() => handleSizeSelect(stock.pk)}

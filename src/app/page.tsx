@@ -4,22 +4,23 @@ import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import Header from './components/Header';
 import { useAllProducts, useNewProducts } from './hooks/useAllProducts';
+import { Product } from './types/graphql';
 import Link from "next/link";
 
 const App: React.FC = () => {
-  const { data, loading, error, refetch: refetchAllProducts } = useAllProducts();
+  const { data, loading, error } = useAllProducts();
   const { data: newProductsData, loading: newLoading, error: newError, refetch: refetchNewProducts } = useNewProducts();
-  const allProducts = data?.products || [];
-  const newArrivals = newProductsData?.products || [];
+  const allProducts = (data as { products?: Product[] })?.products || [];
+  const newArrivals = (newProductsData as { products?: Product[] })?.products || [];
   const promoProducts = allProducts
-    .filter((product) =>
+    .filter((product: Product) =>
       product.stocks?.some(
         (stock?: { discount?: number }) => (stock?.discount ?? 0) > 0
       )
     )
     .slice(0, 4);
 
-  const transformProductForCard = (product: any) => {
+  const transformProductForCard = (product: Product) => {
     return {
       ...product,
       id: product.pk,           // id для ProductCard
@@ -48,7 +49,7 @@ const App: React.FC = () => {
             <div>Error loading products</div>
           ) : newArrivals.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {newArrivals.map((product) => (
+              {newArrivals.map((product: Product) => (
                 <Link
                   key={`new-${product.pk}`}
                   href={`/products/${product.pk}`}
@@ -76,7 +77,7 @@ const App: React.FC = () => {
             <div>Error loading products</div>
           ) : promoProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {promoProducts.map((product) => (
+              {promoProducts.map((product: Product) => (
                 <Link
                   key={`promo-${product.pk}`}
                   href={`/products/${product.pk}`}
@@ -104,7 +105,7 @@ const App: React.FC = () => {
             <div>Error loading products</div>
           ) : allProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {allProducts.map((product) => (
+              {allProducts.map((product: Product) => (
                 <Link
                   key={product.pk}
                   href={`/products/${product.pk}`}
