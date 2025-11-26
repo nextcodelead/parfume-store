@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { notFound } from 'next/navigation';
 import Header from '../../components/Header';
@@ -41,14 +41,24 @@ const CATEGORY_MAP = {
 type CategoryKey = keyof typeof CATEGORY_MAP;
 
 interface CategoryPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
-  const categoryKey = params.slug?.toLowerCase() as CategoryKey;
+  const [slug, setSlug] = useState<string>('');
+  const [isLoadingParams, setIsLoadingParams] = useState(true);
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setSlug(resolvedParams.slug);
+      setIsLoadingParams(false);
+    });
+  }, [params]);
+
+  const categoryKey = slug?.toLowerCase() as CategoryKey;
   const config = CATEGORY_MAP[categoryKey];
 
-  if (!config) {
+  if (!isLoadingParams && !config) {
     notFound();
   }
 
@@ -57,14 +67,26 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
     variables: {
       filters: {
         isPublished: { equals: true },
-        ...config.filters,
+        ...(config?.filters || {}),
       },
       pagination: { limit: 40 },
     },
-    skip: !isClient,
+    skip: !isClient || !config,
   });
 
   const products = (data as ProductsResponse | undefined)?.products ?? [];
+
+  if (isLoadingParams || !config) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 py-10">
+          <div className="text-center text-gray-500">Загрузка...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
