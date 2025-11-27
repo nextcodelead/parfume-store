@@ -156,6 +156,26 @@ export interface Stock {
   weight?: number | null;
 }
 
+export interface UserCartProduct {
+  pk: number;
+  name: string;
+  stocksCount: number;
+  brand: {
+    name: string;
+  };
+  photo: {
+    imageUrl: string;
+  } | null;
+}
+
+export interface UserCartEntry {
+  pk: number;
+  product: UserCartProduct;
+  count: number;
+  __typename?: string;
+  stock?: Stock;
+}
+
 // Типы для ответов мутаций
 export interface UpdateMeResponse {
   updateMe?: {
@@ -195,5 +215,11 @@ export interface ProductClientResponse {
 export interface ProductImagesResponse {
   product: {
     images: ProductImage[];
+  };
+}
+
+export interface MeUserCartResponse {
+  me: {
+    userCart: UserCartEntry[];
   };
 }

@@ -1,23 +1,10 @@
 import { Minus, Plus, X, AlertCircle } from "lucide-react";
 import StockSelect, { Stock } from "../CategoriesMenu/StockSelect";
 import { useEffect, useState } from "react";
+import { UserCartEntry } from "@/app/types/graphql";
 
 type CartItemProps = {
-  cart: {
-    pk: number;
-    product: {
-      pk: number;
-      name: string;
-      stocksCount: number;
-      brand: {
-        name: string
-      }
-      photo: {
-        imageUrl: string
-      }
-    };
-    __typename: string;
-  }
+  cart: UserCartEntry;
   onSetStock: (pk: number, stock: Stock) => void;
   onUpdateQuantity: (pk: number, quantity: number) => void;
   onRemove: (pk: number) => void;

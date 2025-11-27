@@ -11,13 +11,14 @@ import { Trash2, ChevronRight } from "lucide-react";
 import { useRemoveAllFromCart, useRemoveProductFromCart } from "../hooks/useUserCart";
 import { useMeUserCart } from "../hooks/useMe";
 import { Stock } from "../components/CategoriesMenu/StockSelect";
+import { UserCartEntry } from "../types/graphql";
 
 export default function CartPage() {
   const [removeAllFromCart, {loading: removeLoading, error: removeError}] = useRemoveAllFromCart();
   const [removeProductFromCart, {loading: removeProductLoading, error: removeProductError}] = useRemoveProductFromCart();
   const {loading, data, error, refetch} = useMeUserCart();
   const router = useRouter();
-  const [carts, setCarts] = useState<typeof data.me.userCart>([]);
+  const [carts, setCarts] = useState<UserCartEntry[]>([]);
 
   // инициализируем, когда данные придут
   useEffect(() => {
