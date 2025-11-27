@@ -8,6 +8,7 @@ export interface Stock {
   cost: number;
   discount: number;
   quantity: number;
+  volume?: number;
   article?: string;
 }
 
