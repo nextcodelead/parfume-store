@@ -10,7 +10,7 @@ import Button from "../components/Button";
 import { Trash2, ChevronRight } from "lucide-react";
 import { useRemoveAllFromCart, useRemoveProductFromCart } from "../hooks/useUserCart";
 import { useMeUserCart } from "../hooks/useMe";
-import { Stock } from "../components/CategoriesMenu/StockSelect";
+import { Stock } from "../types/graphql";
 import { UserCartEntry } from "../types/graphql";
 
 export default function CartPage() {
