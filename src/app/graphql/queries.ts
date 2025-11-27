@@ -275,3 +275,24 @@ export const STOCKS = gql`
     }
   }
 `;
+export const ORDER_CARTS = gql`
+  query {
+    orderCarts {
+      stock {
+        product {
+          photo {
+            imageUrl
+          }
+          brand {
+            name
+          }
+          name
+        }
+        size
+        unit
+      }
+      cost
+      count
+    }
+  }
+`;

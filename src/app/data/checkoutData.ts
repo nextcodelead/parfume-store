@@ -7,21 +7,21 @@ export const CART_ITEMS: CartItem[] = [
 
 export const DELIVERY_METHODS: DeliveryMethod[] = [
   { 
-    id: 'standard', 
+    id: 'STANDARD', 
     name: 'Стандартная доставка', 
     price: 5.99, 
     time: '5–7 рабочих дней',
     icon: 'truck'
   },
   { 
-    id: 'express', 
+    id: 'EXPRESS', 
     name: 'Экспресс-доставка', 
     price: 12.99, 
     time: '2–3 рабочих дня',
     icon: 'package'
   },
   { 
-    id: 'overnight', 
+    id: 'FAST', 
     name: 'Доставка на следующий день', 
     price: 24.99, 
     time: 'На следующий рабочий день',

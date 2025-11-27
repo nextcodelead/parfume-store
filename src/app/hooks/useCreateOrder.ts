@@ -1,33 +1,9 @@
-import { useMutation, useQuery } from '@apollo/client/react';
-import { CREATE_ORDER } from '../graphql/mutations';
-import { GET_ORDERS, GET_USER_CART } from '../graphql/queries';
+import { useQuery } from '@apollo/client/react';
+import { GET_ORDERS } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
 
 // Хук для создания заказа
-export const useCreateOrder = () => {
-  const [createOrderMutation, { loading, error }] = useMutation(CREATE_ORDER, {
-    refetchQueries: [GET_ORDERS, GET_USER_CART],
-    errorPolicy: 'all',
-  });
 
-  const createOrder = async (input: CreateOrderInput) => {
-    try {
-      const result = await createOrderMutation({
-        variables: { input },
-      });
-      return result.data?.createOrder;
-    } catch (err) {
-      console.error('Error creating order:', err);
-      throw err;
-    }
-  };
-
-  return {
-    createOrder,
-    loading,
-    error,
-  };
-};
 
 // Хук для получения заказов пользователя
 export const useOrders = () => {

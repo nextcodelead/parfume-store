@@ -29,34 +29,6 @@ export const REMOVE_PRODUCT_FROM_USER_CART = gql`
   }
 `;
 
-// Мутация для создания заказа
-export const CREATE_ORDER = gql`
-  mutation CreateOrder($input: CreateOrderInput!) {
-    createOrder(input: $input) {
-      success
-      message
-      order {
-        id
-        orderNumber
-        status
-        totalAmount
-        createdAt
-        items {
-          id
-          quantity
-          price
-          product {
-            pk
-            name
-            price
-            image
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const addProduct = gql`
   mutation($input: ProductInput!) {
   addProduct(input: $input) {
@@ -180,6 +152,20 @@ export const UPDATE_STOCK = gql`
       unit
       volume
       weight
+    }
+  }
+`;
+
+export const BEGIN_BUY = gql`
+  mutation beginBuy($products: [OrderCartInput!]!) {
+    beginBuy(products: $products)
+  }
+`;
+
+export const CREATE_ORDER = gql`
+  mutation($pk: Int, $order: OrderInput!) {
+    createUpdateOrder(pk: $pk, order: $order) {
+      pk
     }
   }
 `;

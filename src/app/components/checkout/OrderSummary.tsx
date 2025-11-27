@@ -1,30 +1,36 @@
 import React from 'react';
 import { ShieldCheck, Package } from 'lucide-react';
-import { CART_ITEMS } from '../../data/checkoutData';
+import { useOrderCarts } from '@/app/hooks/useBuy';
 
 interface OrderSummaryProps {
   deliveryPrice: number;
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({ deliveryPrice }) => {
-  const subtotal = CART_ITEMS.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { data: orderCartsData, loading: orderCartsLoading, error: orderCartsError } = useOrderCarts();
+  const subtotal = orderCartsData?.orderCarts.reduce((sum, item) => sum + item.cost * item.count, 0) || 0;
   const tax = subtotal * 0.1;
   const total = subtotal + deliveryPrice + tax;
-
+  if (orderCartsLoading) {
+    return <div>Loading order summary...</div>;
+  }
+  if (orderCartsError) {
+    return <div>Error loading order summary</div>;
+  }
   return (
     <div className="bg-white rounded-xl p-6 shadow-md sticky top-4">
       <h2 className="text-xl font-bold text-gray-900 mb-4">Сводка заказа</h2>
       
       <div className="space-y-3 mb-4 pb-4 border-b">
-        {CART_ITEMS.map((item) => (
+        {orderCartsData?.orderCarts.map((item) => (
           <div key={item.id} className="flex gap-3">
             <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center text-3xl flex-shrink-0">
-              {item.image}
+              <img src={item.stock.product.photo ? `https://dataset.uz/${item.stock.product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"} alt={item.stock.product.brand.name} className="max-w-full max-h-full" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 text-sm">{item.name}</h3>
-              <p className="text-xs text-gray-600">{item.size} × {item.quantity}</p>
-              <p className="font-bold text-gray-900 text-sm">{(item.price * item.quantity).toFixed(2)} ₽</p>
+              <h3 className="font-semibold text-gray-900 text-sm">{item.stock.product.name}</h3>
+              <p className="text-xs text-gray-600">{item.stock.size}{item.stock.unit} × {item.count}</p>
+              <p className="font-bold text-gray-900 text-sm">{(item.cost * item.count).toFixed(2)} ₽</p>
             </div>
           </div>
         ))}

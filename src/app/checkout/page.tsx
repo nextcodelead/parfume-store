@@ -13,11 +13,13 @@ import ReviewOrder from '../components/checkout/ReviewOrder';
 import OrderSummary from '../components/checkout/OrderSummary';
 import OrderSuccess from '../components/checkout/OrderSuccess';
 import Button from '../components/Button';
+import { useCreateOrder } from '../hooks/useBuy';
 
 const CheckoutPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [orderPk, setOrderPk] = useState<number | null>(null);
   
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -34,8 +36,9 @@ const CheckoutPage: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [deliveryMethod, setDeliveryMethod] = useState('standard');
+  const [deliveryMethod, setDeliveryMethod] = useState('STANDARD');
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [createOrder, {loading, error}] = useCreateOrder();
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -44,7 +47,7 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     console.log('Current step:', currentStep);
     console.log('Form data before validation:', formData);
 
@@ -55,9 +58,53 @@ const CheckoutPage: React.FC = () => {
       setErrors(validationErrors);
       return;
     }
-
-    setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if(currentStep === 0) {
+      const response = await createOrder({
+        variables: {
+          pk: orderPk,
+          "order": {
+            "name": formData.firstName,
+            "surname": formData.lastName,
+            "email": formData.email,
+            "phone": formData.phone
+          }
+        }
+      })
+      const data = response.data;
+      if (data) {
+        const newOrderPk = data.createUpdateOrder.pk;
+        setOrderPk(newOrderPk);
+        setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert('Ошибка при создании заказа. Пожалуйста, попробуйте еще раз.');
+      }
+    } else if(currentStep === 1) {
+      const response = await createOrder({
+        variables: {
+          pk: orderPk,
+          order: {
+            "country": formData.country,
+            "city": formData.city,
+            "street": formData.address,
+            "apartment": formData.apartment,
+            "zipCode": formData.zipCode,
+            "deliveryNotes": formData.deliveryNote,
+            "deliveryType": deliveryMethod
+          }
+        }
+      })
+      const data = response.data;
+      if (data) {
+        setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert('Ошибка при обновлении заказа. Пожалуйста, попробуйте еще раз.');
+      }
+    } else if(currentStep === 2) {
+      setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleBack = () => {

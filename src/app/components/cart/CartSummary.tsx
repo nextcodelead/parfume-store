@@ -1,9 +1,13 @@
+"use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Tag, Package, Gift, ArrowRight } from "lucide-react";
 import  Button  from "../Button";
 import { SHIPPING_OPTIONS } from "../../data/shippingOptions";
 import { CartItemType } from "../../data/cartProductsData";
 import Link from "next/link";
+import { useBeginBuy, useOrderCarts } from "@/app/hooks/useBuy";
+
 type CartSummaryProps = {
   items: [];
 };
@@ -12,11 +16,14 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   const [promoCode, setPromoCode] = useState("");
   const [selectedShipping, setSelectedShipping] = useState("standard");
   const [discount, setDiscount] = useState(0);
+  const [beginBuy, {loading, error}] = useBeginBuy();
+  
 
   const subtotal = items.reduce((sum, item) => sum + (item.stock?.cost ?? 0) * item.count, 0);
   const shipping = SHIPPING_OPTIONS.find((s) => s.id === selectedShipping)?.price || 0;
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax - discount;
+  const router = useRouter();
 
   const applyPromoCode = () => {
     if (promoCode.toUpperCase() === "SAVE10") {
@@ -25,6 +32,18 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
       alert("Invalid promo code");
     }
   };
+
+  const beginProcessBuy = async () => {
+    const products = items.map((item) => ({
+      stockId: item.stock?.pk,
+      count: item.count,
+    }));
+    const res = await beginBuy({ variables: { products } });
+    if (res.data?.beginBuy) {
+      // Redirect to checkout or handle success
+      router.push("/checkout")
+    }
+  }
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-md sticky top-24">
@@ -98,9 +117,12 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
       </div>
 
       <Button variant="primary" size="lg" fullWidth rightIcon={<ArrowRight size={20} />}>
-      <Link href="/checkout" className="flex items-center justify-center w-full">
+      <button onClick={beginProcessBuy} className="flex items-center justify-center w-full">
         Перейти к оформлению заказа
-      </Link>
+      </button>
+      {/* <Link href="/checkout" className="flex items-center justify-center w-full">
+        Перейти к оформлению заказа
+      </Link> */}
       </Button>
 
       <div className="mt-6 space-y-2 text-sm text-gray-600">
