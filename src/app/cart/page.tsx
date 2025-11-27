@@ -82,7 +82,7 @@ export default function CartPage() {
                     prev.map(i => {
                       if (i.pk !== stockId) return i;
                       // Merge existing entry.stock with incoming stock to preserve required fields
-                      // const mergedStock = { ...(i.stock as any), ...(stock as any) } as typeof i.stock;
+                      const mergedStock = { ...(i.stock as any), ...(stock as any) } as typeof i.stock;
                       return { ...i, stock: mergedStock };
                     })
                   );                  
