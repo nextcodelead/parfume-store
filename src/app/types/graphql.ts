@@ -147,7 +147,7 @@ export interface ProductImage {
 export interface Stock {
   pk: number;
   article?: string;
-  volume: number;
+  volume?: number;
   unit: string;
   quantity: number;
   cost: number;
