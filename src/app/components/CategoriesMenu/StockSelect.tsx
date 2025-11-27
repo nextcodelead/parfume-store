@@ -8,6 +8,7 @@ export interface Stock {
   cost: number;
   discount: number;
   quantity: number;
+  article?: string;
 }
 
 interface StockSelectProps {

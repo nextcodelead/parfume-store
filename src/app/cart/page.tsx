@@ -77,17 +77,22 @@ export default function CartPage() {
                   );
                   console.log("Update quantity for pk:", pk, "to", quantity);
                 }}
-                onSetStock={(stockId: number, stock: Stock)  => {
-                  setCarts((prev) =>
-                    prev.map(i => {
-                      if (i.pk !== stockId) return i;
-                      // Merge existing entry.stock with incoming stock while preserving type
-                      const existingStock: UserCartEntry["stock"] = i.stock ?? ({} as UserCartEntry["stock"]);
-                      const mergedStock: UserCartEntry["stock"] = { ...existingStock, ...stock };
-                      return { ...i, stock: mergedStock };
-                    })
-                  );                  
-                }}
+                
+onSetStock={(stockId: number, stock: Stock)  => {
+  setCarts((prev) =>
+    prev.map(i => {
+      if (i.pk !== stockId) return i;
+      // Merge existing entry.stock with incoming stock while preserving type
+      const existingStock: UserCartEntry["stock"] = i.stock ?? ({} as UserCartEntry["stock"]);
+      const mergedStock: UserCartEntry["stock"] = { 
+        ...existingStock, 
+        ...stock,
+        article: stock.article || existingStock.article || '' // значение по умолчанию
+      };
+      return { ...i, stock: mergedStock };
+    })
+  );                  
+}}
                 onRemove={handleRemove}
             />
           ))}

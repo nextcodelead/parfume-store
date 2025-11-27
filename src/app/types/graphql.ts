@@ -146,7 +146,7 @@ export interface ProductImage {
 // Типы для склада
 export interface Stock {
   pk: number;
-  article: string;
+  article?: string;
   volume: number;
   unit: string;
   quantity: number;
