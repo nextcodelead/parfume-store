@@ -81,8 +81,9 @@ export default function CartPage() {
                   setCarts((prev) =>
                     prev.map(i => {
                       if (i.pk !== stockId) return i;
-                      // Merge existing entry.stock with incoming stock to preserve required fields
-                      const mergedStock = { ...(i.stock as any), ...(stock as any) } as typeof i.stock;
+                      // Merge existing entry.stock with incoming stock while preserving type
+                      const existingStock: UserCartEntry["stock"] = i.stock ?? ({} as UserCartEntry["stock"]);
+                      const mergedStock: UserCartEntry["stock"] = { ...existingStock, ...stock };
                       return { ...i, stock: mergedStock };
                     })
                   );                  
