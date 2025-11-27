@@ -77,9 +77,14 @@ export default function CartPage() {
                   );
                   console.log("Update quantity for pk:", pk, "to", quantity);
                 }}
-                onSetStock={(stockId: number, stock: Stock) => {
+                onSetStock={(stockId: number, stock: Stock)  => {
                   setCarts((prev) =>
-                    prev.map(i => i.pk === stockId ? { ...i, stock } : i)
+                    prev.map(i => {
+                      if (i.pk !== stockId) return i;
+                      // Merge existing entry.stock with incoming stock to preserve required fields
+                      const mergedStock = { ...(i.stock as any), ...(stock as any) } as typeof i.stock;
+                      return { ...i, stock: mergedStock };
+                    })
                   );                  
                 }}
                 onRemove={handleRemove}
