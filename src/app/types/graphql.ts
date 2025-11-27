@@ -152,7 +152,7 @@ export interface Stock {
   quantity: number;
   cost: number;
   discount: number;
-  size?: string | null;
+  size?: string;
   weight?: number | null;
 }
 

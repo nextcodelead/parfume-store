@@ -1,16 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useStocks } from "@/app/hooks/useStocks";
+import { Stock } from "@/app/types/graphql";
 
-export interface Stock {
-  pk: number;
-  size: string;
-  unit: string;
-  cost: number;
-  discount: number;
-  quantity: number;
-  volume?: number;
-  article?: string;
-}
 
 interface StockSelectProps {
   productId: number;
