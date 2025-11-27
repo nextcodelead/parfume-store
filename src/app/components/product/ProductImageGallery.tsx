@@ -1,14 +1,22 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useProductImagesClient } from "@/app/hooks/useProducts";
+import { ProductImage } from "@/app/types/graphql";
 
 interface Props {
   productId: number;
 }
 
+interface ProductImagesResponse {
+  product: {
+    images: ProductImage[];
+  };
+}
+
 const ProductImageGallery: React.FC<Props> = ({ productId }) => {
-  const {load, data, error, refetch} = useProductImagesClient(productId);
+  const {load, data, error} = useProductImagesClient(productId);
   const [currentImage, setCurrentImage] = useState(0);
   if (error) {
     return <div>Error loading images</div>;
@@ -16,14 +24,20 @@ const ProductImageGallery: React.FC<Props> = ({ productId }) => {
   if (load || !data) {
     return <div>Loading images...</div>;
   }
-  const images = data.product.images.map((img: any) => img.imageUrl);
+  const response = data as ProductImagesResponse;
+  const images = response.product.images.map((img: ProductImage) => img.imageUrl);
   return (
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative bg-gray-100 rounded-2xl aspect-square flex items-center justify-center overflow-hidden group">
-        <div className="text-9xl">
-          <img src={`https://dataset.uz/${images[currentImage]}`} alt={`Product Image ${currentImage + 1}`} className="object-contain w-full h-full" />
-        </div>
+        <Image 
+          src={`https://dataset.uz/${images[currentImage]}`} 
+          alt={`Product Image ${currentImage + 1}`} 
+          width={600}
+          height={600}
+          className="object-contain w-full h-full"
+          unoptimized
+        />
         
         {/* Navigation Arrows */}
         {images.length > 1 && (
@@ -54,7 +68,14 @@ const ProductImageGallery: React.FC<Props> = ({ productId }) => {
               currentImage === idx ? 'ring-2 ring-rose-600' : ''
             }`}
           >
-            <img src={`https://dataset.uz/${images[idx]}`} alt={`Product Image ${idx + 1}`} className="object-contain w-full h-full" />
+            <Image 
+              src={`https://dataset.uz/${images[idx]}`} 
+              alt={`Product Image ${idx + 1}`} 
+              width={150}
+              height={150}
+              className="object-contain w-full h-full"
+              unoptimized
+            />
           </button>
         ))}
       </div>

@@ -136,3 +136,90 @@ export interface CreateOrderInput {
   paymentMethod: string;
   notes?: string;
 }
+
+// Типы для изображений продукта
+export interface ProductImage {
+  asMain: boolean;
+  imageUrl: string;
+}
+
+// Типы для склада
+export interface Stock {
+  pk: number;
+  article: string;
+  volume: number;
+  unit: string;
+  quantity: number;
+  cost: number;
+  discount: number;
+  size?: string | null;
+  weight?: number | null;
+}
+
+export interface UserCartProduct {
+  pk: number;
+  name: string;
+  stocksCount: number;
+  brand: {
+    name: string;
+  };
+  photo: {
+    imageUrl: string;
+  } | null;
+}
+
+export interface UserCartEntry {
+  pk: number;
+  product: UserCartProduct;
+  count: number;
+  __typename?: string;
+  stock?: Stock;
+}
+
+// Типы для ответов мутаций
+export interface UpdateMeResponse {
+  updateMe?: {
+    success: boolean;
+    message: string;
+    user?: User;
+  };
+}
+
+export interface UpdateUserResponse {
+  updateUser?: {
+    success: boolean;
+    message: string;
+    user?: User;
+  };
+}
+
+// Типы для ответов запросов продуктов
+export interface ProductClientResponse {
+  product: {
+    pk: number;
+    brand: {
+      name: string;
+    };
+    categoryRoute: Array<{
+      name: string;
+    }>;
+    starsRating: number;
+    name: string;
+    countReviews: number;
+    description: string;
+    aromNote: string | null;
+    stocks: Stock[];
+  };
+}
+
+export interface ProductImagesResponse {
+  product: {
+    images: ProductImage[];
+  };
+}
+
+export interface MeUserCartResponse {
+  me: {
+    userCart: UserCartEntry[];
+  };
+}

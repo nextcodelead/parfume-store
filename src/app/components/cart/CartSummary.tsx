@@ -4,12 +4,13 @@ import { useState } from "react";
 import { Tag, Package, Gift, ArrowRight } from "lucide-react";
 import  Button  from "../Button";
 import { SHIPPING_OPTIONS } from "../../data/shippingOptions";
-import { CartItemType } from "../../data/cartProductsData";
 import Link from "next/link";
 import { useBeginBuy, useOrderCarts } from "@/app/hooks/useBuy";
+import { UserCartEntry } from "@/app/types/graphql";
+import { Stock } from "../CategoriesMenu/StockSelect";
 
 type CartSummaryProps = {
-  items: [];
+  items: Array<UserCartEntry & { stock?: Stock }>;
 };
 
 export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
