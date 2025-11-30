@@ -217,9 +217,40 @@ export interface ProductImagesResponse {
     images: ProductImage[];
   };
 }
+export interface MeMainResponse {
+  me: {
+    // добавьте поля которые возвращает ME_MAIN запрос
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    // ... другие поля
+  };
+}
 
 export interface MeUserCartResponse {
   me: {
-    userCart: UserCartEntry[];
+    userCart: Array<{
+      pk: number;
+      count: number;
+      product: {
+        pk: number;
+        name: string;
+        brand: {
+          name: string;
+        };
+        photo: {
+          imageUrl: string;
+        } | null;
+      };
+      stock?: {
+        pk: number;
+        size: string;
+        unit: string;
+        cost: number;
+        discount: number;
+        quantity: number;
+      };
+    }>;
   };
 }
