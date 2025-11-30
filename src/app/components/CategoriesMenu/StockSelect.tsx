@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useStocks } from "@/app/hooks/useStocks";
 import { Stock } from "@/app/types/graphql";
-
 
 interface StockSelectProps {
   productId: number;
@@ -11,7 +10,9 @@ interface StockSelectProps {
 const StockSelect: React.FC<StockSelectProps> = ({ productId, onChange }) => {
   console.log("productId:", productId);
   const { data, loading, error } = useStocks(productId);
-  const stocks: Stock[] = data?.stocks || [];
+  
+  // Используем useMemo для стабильной ссылки
+  const stocks: Stock[] = useMemo(() => data?.stocks || [], [data?.stocks]);
 
   // локальный selected pk, чтобы select действительно менялся
   const [selectedPk, setSelectedPk] = useState<number | "">("");
@@ -44,7 +45,7 @@ const StockSelect: React.FC<StockSelectProps> = ({ productId, onChange }) => {
     if (stocks.length === 0) {
       setSelectedPk("");
     }
-  }, [stocks, onChange]);
+  }, [stocks, onChange]); // Теперь stocks имеет стабильную ссылку
 
   if (loading) return <p>Loading stocks...</p>;
   if (error) return <p>Error loading stocks: {error.message}</p>;

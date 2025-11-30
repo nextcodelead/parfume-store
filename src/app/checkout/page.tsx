@@ -70,16 +70,16 @@ const CheckoutPage: React.FC = () => {
           }
         }
       })
+      const data = response.data; // TypeScript автоматически знает тип
+      if (data?.createUpdateOrder) {
+        const newOrderPk = data.createUpdateOrder.pk; // Без any!
+        setOrderPk(newOrderPk);
+        setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        console.error('Order creation failed:', data);
+      }
 
-    const data = response.data;
-    if (data && 'createUpdateOrder' in data) {
-      const newOrderPk = (data as any).createUpdateOrder.pk;
-      setOrderPk(newOrderPk);
-      setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      console.error('Order creation failed:', data);
-    }
     } else if(currentStep === 1) {
       const response = await createOrder({
         variables: {

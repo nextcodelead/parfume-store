@@ -1,13 +1,14 @@
 import { BEGIN_BUY, CREATE_ORDER } from '../graphql/mutations';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ORDER_CARTS } from '../graphql/queries';
+import { Stock } from '../types/graphql'; // добавьте этот импорт
 
 export interface ProductBuy {
   stockId: number;
   count: number;
 }
 
-// Добавьте интерфейсы для типизации
+// Интерфейсы для типизации
 interface CreateOrderResponse {
   createUpdateOrder: {
     pk: number;
@@ -31,6 +32,30 @@ interface CreateOrderVariables {
   };
 }
 
+// Добавьте интерфейс для orderCarts
+interface OrderCartItem {
+  id: string;
+  cost: number;
+  count: number;
+  stock: {
+    size: string;
+    unit: string;
+    product: {
+      name: string;
+      brand: {
+        name: string;
+      };
+      photo: {
+        imageUrl: string;
+      } | null;
+    };
+  };
+}
+
+interface OrderCartsResponse {
+  orderCarts: OrderCartItem[];
+}
+
 export const useBeginBuy = () => {
   return useMutation(BEGIN_BUY, { errorPolicy: "all" });
 };
@@ -40,7 +65,7 @@ export const useCreateOrder = () => {
 };
 
 export const useOrderCarts = () => {
-  return useQuery(ORDER_CARTS, {
+  return useQuery<OrderCartsResponse>(ORDER_CARTS, {
     variables: {},
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
