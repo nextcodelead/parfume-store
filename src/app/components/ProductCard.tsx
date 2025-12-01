@@ -10,6 +10,7 @@ type ProductWithStocks = Product & {
     cost?: number;
     discount?: number;
   }[];
+  isInMyCart?: boolean;
 };
 
 interface Props {
@@ -88,7 +89,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
               </div>
             ) : (
               <span className="text-xl font-bold text-gray-900">
-                {SITE_CONFIG.currency}{displayPrice.toFixed(2)}
+                {SITE_CONFIG.currency}{Number(displayPrice).toFixed(2)}
               </span>
             )}
           </div>

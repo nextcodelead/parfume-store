@@ -1,7 +1,19 @@
 import { useQuery } from '@apollo/client/react';
 import { ME_MAIN, ME_USER_CART } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
-import { MeUserCartResponse, MeMainResponse } from '../types/graphql';
+import { MeUserCartResponse } from '../types/graphql';
+
+// Расширяем тип для корректной типизации countProductInUserCart
+export type MeMainResponse = {
+  me: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    countProductInUserCart?: number;
+    // ...другие поля, если нужны
+  } | null;
+};
 
 // Хук для получения корзины пользователя
 export const useMeMain = () => {

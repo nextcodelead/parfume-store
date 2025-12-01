@@ -1,5 +1,7 @@
 import { Minus, Plus, X, AlertCircle } from "lucide-react";
-import StockSelect, { Stock } from "../CategoriesMenu/StockSelect";
+import StockSelect from "../CategoriesMenu/StockSelect";
+import type { Stock } from "@/app/types/graphql";
+
 import { useEffect, useState } from "react";
 import { UserCartEntry } from "@/app/types/graphql";
 

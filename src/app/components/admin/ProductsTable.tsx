@@ -10,8 +10,6 @@ import UploadImageModal from './UploadImageModal';
 import { useDeleteProduct } from '@/app/hooks/useProducts';
 import UpdateStockModal from './UpdateStockModal';
 
-
-
 const ProductsTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,6 +20,7 @@ const ProductsTable: React.FC = () => {
   const [isUploadImageModalOpen, setIsUploadImageModalOpen] = useState(false);
   const { data, loading, error, refetch } = useAdminProducts(searchTerm, currentPage);
   const { data: dataProductsCount, loading: loadingProductsCount, error: errorProductsCount } = useAdminProductsCount(searchTerm);
+
   const [deleteProduct, { loading: deleting, error: deleteError }] = useDeleteProduct();
 
   const handleAddProduct = (productData: ProductFormData) => {
@@ -107,12 +106,11 @@ const ProductsTable: React.FC = () => {
           <tbody className="divide-y divide-gray-200">
             {loading && <tr><td colSpan={7} className="text-center py-4">Загрузка...</td></tr>}
             {error && <tr><td colSpan={7} className="text-center py-4">Ошибка загрузки</td></tr>}
-            {data && data.products.map((product) => (
+            {data?.products.map((product) => (
               <tr key={product.pk} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                      {/* {product.image} */}
                       {product.photo?.imageUrl ? 
                       <img src={`https://dataset.uz/${product.photo.imageUrl}`} alt={`Product Image ${product.pk}`} width={80} height={80} className="object-cover rounded" /> : <span>🌹</span>}
                     </div>
@@ -177,7 +175,6 @@ const ProductsTable: React.FC = () => {
       <div className="p-6 border-t border-gray-200 flex items-center justify-between">
         {errorProductsCount && <p>Ошибка загрузки количества товаров</p>}
 
-        {/* безопасный рендер: либо есть числа — показываем корректно, иначе — нейтральный текст */}
         {!loadingProductsCount && dataProductsCount?.productsCount != null ? (
           <p className="text-sm text-gray-600">
             Показано {currentPage * 5 + 1}-

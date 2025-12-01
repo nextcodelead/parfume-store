@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { X, ChevronRight } from 'lucide-react';
-import { Category, Subcategory } from '../../types/graphql';
+import { Subcategory } from '../../types/graphql';
+// Category тип теперь импортируем из useCategories.ts
+import type { Category as BaseCategory } from '../../hooks/useCategories';
 import { useCategories } from '../../hooks/useCategories';
 
 interface CategoriesMenuProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+// Расширяем Category для поддержки children
+interface Category extends BaseCategory {
+  children?: Subcategory[];
 }
 
 export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose }) => {
@@ -14,7 +21,10 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading categories</div>;
-  const categories = data?.categories as Category[] ?? [];
+  const categories =
+    data && typeof data === "object" && data !== null && "categories" in data
+      ? (data as { categories: Category[] }).categories
+      : [];
   return (
     <>
       {/* Overlay */}
@@ -63,7 +73,7 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
           </div>
 
           {hoveredCategory && (
-            <SubcategoriesPanel subcategories={categories.find(cat => cat.pk === hoveredCategory)?.children} onClose={onClose} />
+            <SubcategoriesPanel subcategories={categories.find(cat => cat.pk === hoveredCategory)?.children ?? []} onClose={onClose} />
           )}
         </div>
       </div>

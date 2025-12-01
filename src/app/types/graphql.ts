@@ -104,7 +104,19 @@ export interface BrandsResponse {
 }
 
 export interface MeResponse {
-  me: User;
+  me: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    sex?: 'MALE' | 'FEMALE';
+    dateOfBirth?: string;
+    avatar?: string;
+    role?: 'ADMIN' | 'USER';
+    createdAt: string;
+    countProductInUserCart?: number;
+  };
 }
 
 export interface OrdersResponse {
@@ -218,6 +230,7 @@ export interface ProductImagesResponse {
     images: ProductImage[];
   };
 }
+
 export interface MeMainResponse {
   me: {
     // добавьте поля которые возвращает ME_MAIN запрос

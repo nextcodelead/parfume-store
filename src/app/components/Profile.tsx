@@ -248,11 +248,13 @@ export default function Profile() {
               <div className="pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-600">
                   <span className="font-medium">Дата регистрации:</span> {
-                    new Date(user.createdAt).toLocaleDateString('ru-RU', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })
+                    user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString('ru-RU', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                      : 'Не указана'
                   }
                 </p>
               </div>

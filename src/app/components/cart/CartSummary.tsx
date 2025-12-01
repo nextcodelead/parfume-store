@@ -7,7 +7,8 @@ import { SHIPPING_OPTIONS } from "../../data/shippingOptions";
 import Link from "next/link";
 import { useBeginBuy, useOrderCarts } from "@/app/hooks/useBuy";
 import { UserCartEntry } from "@/app/types/graphql";
-import { Stock } from "../CategoriesMenu/StockSelect";
+import type { Stock } from "@/app/types/graphql";
+
 
 type CartSummaryProps = {
   items: Array<UserCartEntry & { stock?: Stock }>;
@@ -35,14 +36,31 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   };
 
   const beginProcessBuy = async () => {
-    const products = items.map((item) => ({
-      stockId: item.stock?.pk,
+    // Явно типизируем payload для мутации
+    const products: { stockId?: number | null; count: number }[] = items.map((item) => ({
+      stockId: item.stock?.pk ?? null,
       count: item.count,
     }));
-    const res = await beginBuy({ variables: { products } });
-    if (res.data?.beginBuy) {
-      // Redirect to checkout or handle success
-      router.push("/checkout")
+
+    try {
+      const res = await beginBuy({ variables: { products } });
+      const payload = res.data?.beginBuy;
+      if (payload && payload.success) {
+        // Если сервер вернул redirectUrl — можно перенаправить туда
+        if (payload.redirectUrl) {
+          router.push(payload.redirectUrl);
+        } else {
+          // fallback: перейти на checkout
+          router.push("/checkout");
+        }
+      } else {
+        // обработка ошибки / неуспешного результата
+        console.warn('Begin buy failed or returned no success flag', payload);
+        alert('Не удалось начать оформление. Попробуйте ещё раз.');
+      }
+    } catch (err) {
+      console.error('Begin buy error:', err);
+      alert('Ошибка при попытке оформить заказ.');
     }
   }
 

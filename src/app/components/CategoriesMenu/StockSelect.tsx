@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useStocks } from "@/app/hooks/useStocks";
-import { Stock } from "@/app/types/graphql";
+import type { Stock } from "@/app/types/graphql";
 
 interface StockSelectProps {
   productId: number;

@@ -1,14 +1,16 @@
-import { BEGIN_BUY, CREATE_ORDER } from '../graphql/mutations';
 import { useMutation, useQuery } from '@apollo/client/react';
-import { ORDER_CARTS } from '../graphql/queries';
-import { Stock } from '../types/graphql'; // добавьте этот импорт
+import { BEGIN_BUY, CREATE_ORDER } from "../graphql/mutations";
+import { ORDER_CARTS } from "../graphql/queries";
+
+// ======================
+// Типы
+// ======================
 
 export interface ProductBuy {
-  stockId: number;
+  stockId?: number | null;
   count: number;
 }
 
-// Интерфейсы для типизации
 interface CreateOrderResponse {
   createUpdateOrder: {
     pk: number;
@@ -32,7 +34,6 @@ interface CreateOrderVariables {
   };
 }
 
-// Добавьте интерфейс для orderCarts
 interface OrderCartItem {
   id: string;
   cost: number;
@@ -42,12 +43,8 @@ interface OrderCartItem {
     unit: string;
     product: {
       name: string;
-      brand: {
-        name: string;
-      };
-      photo: {
-        imageUrl: string;
-      } | null;
+      brand: { name: string };
+      photo: { imageUrl: string } | null;
     };
   };
 }
@@ -56,18 +53,39 @@ interface OrderCartsResponse {
   orderCarts: OrderCartItem[];
 }
 
+// ======================
+// Хуки
+// ======================
+
+// Типы для мутации beginBuy
+export interface BeginBuyPayload {
+  success: boolean;
+  orderId?: number;
+  redirectUrl?: string;
+  // любые дополнительные поля от сервера можно добавить сюда как optional
+}
+
+export interface BeginBuyResponse {
+  beginBuy: BeginBuyPayload | null;
+}
+
+export interface BeginBuyVariables {
+  products: ProductBuy[];
+}
+
+// ✔ ВСЁ ПРАВИЛЬНО (типизированный)
 export const useBeginBuy = () => {
-  return useMutation(BEGIN_BUY, { errorPolicy: "all" });
+  return useMutation<BeginBuyResponse, BeginBuyVariables>(BEGIN_BUY, { errorPolicy: "all" });
 };
 
+// ✔ Полностью типизировано
 export const useCreateOrder = () => {
-  return useMutation<CreateOrderResponse, CreateOrderVariables>(CREATE_ORDER, { errorPolicy: "all" });
+  return useMutation<CreateOrderResponse, CreateOrderVariables>(CREATE_ORDER);
 };
 
+// ✔ orderCarts
 export const useOrderCarts = () => {
   return useQuery<OrderCartsResponse>(ORDER_CARTS, {
-    variables: {},
-    fetchPolicy: 'cache-first',
-    errorPolicy: 'all',
+    fetchPolicy: "cache-first",
   });
 };

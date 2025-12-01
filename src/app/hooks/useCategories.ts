@@ -4,7 +4,7 @@ import { useIsClient } from './useIsClient';
 
 export const useCategories = () => {
   const isClient = useIsClient();
-  return useQuery(GET_CATEGORIES, {
+  return useQuery<CategoriesResponse>(GET_CATEGORIES, {
     variables: { 
       "filter": {
         "parentId": {
@@ -20,7 +20,7 @@ export const useCategories = () => {
 
 export const useSelectCategories = () => {
   const isClient = useIsClient();
-  return useQuery(ADMIN_CREATE_PRODUCT_SELECT_CATEGORY, {
+  return useQuery<CategoriesResponse>(ADMIN_CREATE_PRODUCT_SELECT_CATEGORY, {
     variables: {
       "filter": {
         "parentId": {
@@ -54,6 +54,23 @@ export const useProductsByDiscount = () => {
   });
 };
 
+// Тип для ответа запроса списка продуктов
+export interface AdminProductsResponse {
+  products: {
+    pk: number;
+    name: string;
+    category: {
+      name: string;
+    };
+    count: number;
+    countCells: number;
+    status: string;
+    photo?: {
+      imageUrl: string;
+    };
+  }[];
+}
+
 export const useAdminProducts = (name: string | null, page: number = 0) => {
   const isClient = useIsClient();
   let filters = null;
@@ -64,7 +81,7 @@ export const useAdminProducts = (name: string | null, page: number = 0) => {
       }
     };
   }
-  return useQuery(GET_PRODUCTS_ADMIN, {
+  return useQuery<AdminProductsResponse>(GET_PRODUCTS_ADMIN, {
     variables: { 
       filters: filters,
       pagination: {
@@ -77,6 +94,12 @@ export const useAdminProducts = (name: string | null, page: number = 0) => {
     skip: !isClient,
   });
 };
+
+// Тип для ответа запроса количества продуктов
+export interface ProductsCountResponse {
+  productsCount: number;
+}
+
 export const useAdminProductsCount = (name: string | null) => {
   const isClient = useIsClient();
   let filters = null;
@@ -87,7 +110,7 @@ export const useAdminProductsCount = (name: string | null) => {
       }
     };
   }
-  return useQuery(GET_PRODUCTS_COUNT_ADMIN, {
+  return useQuery<ProductsCountResponse>(GET_PRODUCTS_COUNT_ADMIN, {
     variables: { 
       filters: filters,
     },

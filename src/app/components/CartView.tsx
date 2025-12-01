@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useUserCart, useAddToCart } from '../hooks/useUserCart';
+import { useUserCart, UserCartResponse, useAddToCart } from '../hooks/useUserCart';
 
 export default function CartView() {
   const { data, loading, error } = useUserCart();
@@ -27,7 +27,7 @@ export default function CartView() {
     );
   }
 
-  const cart = data?.userCart;
+  const cart = (data as UserCartResponse)?.userCart;
   const items = cart?.items || [];
 
   if (items.length === 0) {

@@ -131,11 +131,22 @@ export const GET_ORDERS = gql`
   }
 `;
 // TODO проверить и исправить под реальную схему
-export const GET_ME = gql` 
-  query categories($filter: CategoryFilter) {
-    categories(filters: $filter) {
-      pk
+export const GET_ME = gql`
+  query Me {
+    me {
+      id
+      email
+      firstName
+      lastName
+      phone
+      sex
+      dateOfBirth
+      createdAt
+      avatar
+      role
+      countProductInUserCart
     }
+  }
   }
 `;
 
@@ -241,6 +252,8 @@ export const ME_MAIN = gql`
     }
   }
 `;
+
+
 export const ME_USER_CART = gql`
     query meUserCart {
       me {

@@ -16,12 +16,12 @@ interface ProductImagesResponse {
 }
 
 const ProductImageGallery: React.FC<Props> = ({ productId }) => {
-  const {load, data, error} = useProductImagesClient(productId);
+  const {loading, data, error} = useProductImagesClient(productId);
   const [currentImage, setCurrentImage] = useState(0);
   if (error) {
     return <div>Error loading images</div>;
   }
-  if (load || !data) {
+  if (loading || !data) {
     return <div>Loading images...</div>;
   }
   const response = data as ProductImagesResponse;

@@ -4,10 +4,27 @@ import { GET_ME } from '../graphql/queries';
 import { UpdateUserInput, UpdateMeResponse, UpdateUserResponse } from '../types/graphql';
 import { useIsClient } from './useIsClient';
 
+// Тип для данных текущего пользователя
+export interface MeResponse {
+  me: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    sex?: 'MALE' | 'FEMALE' | null;
+    dateOfBirth?: string;
+    avatar?: string;
+    role?: 'ADMIN' | 'USER';
+    createdAt?: string;
+    // ... любые другие поля, которые возвращает GET_ME
+  };
+}
+
 // Хук для получения данных текущего пользователя
 export const useMe = () => {
   const isClient = useIsClient();
-  return useQuery(GET_ME, {
+  return useQuery<MeResponse>(GET_ME, {
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
     skip: !isClient,
@@ -17,7 +34,7 @@ export const useMe = () => {
 // Хук для обновления данных текущего пользователя
 export const useUpdateMe = () => {
   const [updateMeMutation, { loading, error }] = useMutation<UpdateMeResponse>(UPDATE_ME, {
-    refetchQueries: [GET_ME],
+    refetchQueries: [{ query: GET_ME }],
     errorPolicy: 'all',
   });
 

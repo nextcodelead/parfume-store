@@ -1,4 +1,5 @@
 import { useSelectCategories } from "@/app/hooks/useCategories";
+import type { Category } from "@/app/hooks/useCategories";
 
 interface CategorySelectProps {
   value: number | null;
@@ -27,7 +28,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ value, onChange }) => {
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
-        {categories.map((category) => (
+        {categories.map((category: Category) => (
           <option key={category.pk} value={category.pk}>
             {category.name}
           </option>
