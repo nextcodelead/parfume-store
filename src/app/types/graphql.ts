@@ -174,6 +174,7 @@ export interface UserCartEntry {
   count: number;
   __typename?: string;
   stock?: Stock;
+  stocksCount?: number;
 }
 
 // Типы для ответов мутаций

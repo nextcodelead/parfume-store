@@ -10,40 +10,63 @@ import Button from "../components/Button";
 import { Trash2, ChevronRight } from "lucide-react";
 import { useRemoveAllFromCart, useRemoveProductFromCart } from "../hooks/useUserCart";
 import { useMeUserCart } from "../hooks/useMe";
-import { Stock } from "../types/graphql";
-import { UserCartEntry } from "../types/graphql";
+import { Stock, UserCartEntry } from "../types/graphql";
+
+// Создаем совместимый тип для данных с бекенда
+interface BackendCartItem {
+  pk: number;
+  count: number;
+  product: {
+    pk: number;
+    name: string;
+    brand: { name: string };
+    photo: { imageUrl: string } | null;
+  };
+  stock?: Stock;
+}
 
 export default function CartPage() {
-  const [removeAllFromCart, {loading: removeLoading, error: removeError}] = useRemoveAllFromCart();
-  const [removeProductFromCart, {loading: removeProductLoading, error: removeProductError}] = useRemoveProductFromCart();
-  const {loading, data, error, refetch} = useMeUserCart();
+  const [removeAllFromCart] = useRemoveAllFromCart();
+  const [removeProductFromCart] = useRemoveProductFromCart();
+  const { loading, data, error, refetch } = useMeUserCart();
   const router = useRouter();
   const [carts, setCarts] = useState<UserCartEntry[]>([]);
 
-  // инициализируем, когда данные придут
+  // Преобразуем данные при получении
   useEffect(() => {
     if (data?.me?.userCart) {
-      setCarts(data.me.userCart);
+      const backendData = data.me.userCart as unknown as BackendCartItem[];
+      
+      const transformedCarts: UserCartEntry[] = backendData.map(item => ({
+        ...item,
+        product: {
+          ...item.product,
+          stocksCount: 0 // значение по умолчанию
+        }
+      }));
+      
+      setCarts(transformedCarts);
     }
   }, [data?.me?.userCart]);
 
-
-  if (!data || loading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
-  if( error ) {
+  
+  if (error) {
     return <div>Error loading cart data</div>;
   }
+  
   if (carts.length === 0) {
     return <EmptyState type="cart" />;
   }
 
   const handleRemove = async (pk: number) => {
-    try{
+    try {
       setCarts((prev) => prev.filter(item => item.pk !== pk));
-      await removeProductFromCart({variables: {pk: pk}})
+      await removeProductFromCart({ variables: { pk } });
       await refetch();
-    } catch(err) {
+    } catch (err) {
       console.error("Failed to remove product from cart:", err);
     }
   }
@@ -68,35 +91,33 @@ export default function CartPage() {
           </div>
 
           {carts.map((item) => (
-              <CartItem
-                key={item.pk}
-                cart={item}
-                onUpdateQuantity={(pk, quantity) => {
-                  setCarts((prev) =>
-                    prev.map(i => i.pk === pk ? { ...i, count: quantity } : i)
-                  );
-                  console.log("Update quantity for pk:", pk, "to", quantity);
-                }}
-                
-                onSetStock={(stockId: number, stock: Stock)  => {
-                  setCarts((prev) =>
-                    prev.map(i => {
-                      if (i.pk !== stockId) return i;
-                      // Merge existing entry.stock with incoming stock while preserving type
-                      const existingStock: UserCartEntry["stock"] = i.stock ?? ({} as UserCartEntry["stock"]);
-                      const mergedStock: UserCartEntry["stock"] = { 
-                        ...existingStock, 
-                        ...stock,
-                        article: stock.article || existingStock?.article || '', // ← добавить ? для безопасного доступа
-                        volume: stock.volume ?? existingStock?.volume ?? 0 // ← добавить ? для безопасного доступа
-                      };
-                      return { ...i, stock: mergedStock };
-                    })
-                  );                  
-                }}
-                onRemove={handleRemove}
+            <CartItem
+              key={item.pk}
+              cart={item}
+              onUpdateQuantity={(pk, quantity) => {
+                setCarts((prev) =>
+                  prev.map(i => i.pk === pk ? { ...i, count: quantity } : i)
+                );
+              }}
+              onSetStock={(stockId: number, stock: Stock) => {
+                setCarts((prev) =>
+                  prev.map(i => {
+                    if (i.pk !== stockId) return i;
+                    const existingStock = i.stock ?? {} as Stock;
+                    const mergedStock: Stock = { 
+                      ...existingStock, 
+                      ...stock,
+                      article: stock.article || existingStock?.article || '',
+                      volume: stock.volume ?? existingStock?.volume ?? 0
+                    };
+                    return { ...i, stock: mergedStock };
+                  })
+                );
+              }}
+              onRemove={handleRemove}
             />
           ))}
+          
           {/* Продолжить покупки */}
           <Button
             variant="outline"
