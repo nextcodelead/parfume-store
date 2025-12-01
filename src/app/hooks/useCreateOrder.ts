@@ -1,14 +1,12 @@
+// src/app/hooks/useOrders.ts
 import { useQuery } from '@apollo/client/react';
 import { GET_ORDERS } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
 
-// Хук для создания заказа
-
-
 // Хук для получения заказов пользователя
 export const useOrders = () => {
   const isClient = useIsClient();
-  return useQuery(GET_ORDERS, {
+  return useQuery<OrdersResponse>(GET_ORDERS, {
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
     skip: !isClient,
