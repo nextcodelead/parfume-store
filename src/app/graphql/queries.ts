@@ -149,7 +149,6 @@ export const GET_ME = gql`
   }
 `;
 
-
 export const GET_PRODUCT_IMAGES = gql` 
   query getImages($filters: ProductImageFilter) {
     productImages(filters: $filters) {
