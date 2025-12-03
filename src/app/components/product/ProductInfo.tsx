@@ -4,6 +4,8 @@ import { ChevronRight, Check, Minus, Plus, Heart, Share2, ShoppingCart } from "l
 import Button from "../Button";
 import { useProductClient } from "@/app/hooks/useProducts";
 import { Stock, ProductClientResponse } from "@/app/types/graphql";
+import { useAddToCart } from "@/app/hooks/useUserCart";
+import { useMeMain } from "@/app/hooks/useMe";
 
 
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 
 const ProductInfo: React.FC<Props> = ({ productId }) => {
   const { loading, data, error } = useProductClient(productId);
+  const { addToCart, loading: addingToCart } = useAddToCart();
 
   const [selectedSize, setSelectedSize] = useState<Stock | null>(null);
 
@@ -46,7 +49,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
     setQuantity(q => q + 1);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!productData?.product) return;
     console.log('Adding to cart:', {
       productId: productData.product.pk,
@@ -55,6 +58,9 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
       quantity: quantity,
       price: selectedSize?.discount ?? selectedSize?.cost ?? 0
     });
+    await addToCart(productData.product.pk, 1);
+    // reload page
+    window.location.reload();
   };
 
   const handleShare = (platform: string) => {

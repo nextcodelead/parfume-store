@@ -211,6 +211,7 @@ export const GET_STOCK = gql`
 export const GET_PRODUCT_CLIENT = gql` 
   query($productId: Int!) {
     product(id: $productId) {
+      pk
       brand {
         name
       }

@@ -31,7 +31,7 @@ const ProductImageGallery: React.FC<Props> = ({ productId }) => {
       {/* Main Image */}
       <div className="relative bg-gray-100 rounded-2xl aspect-square flex items-center justify-center overflow-hidden group">
         <Image 
-          src={`https://dataset.uz/${images[currentImage]}`} 
+          src={images.length > 0 ? `https://dataset.uz/${images[currentImage]}` : 'https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image'} 
           alt={`Product Image ${currentImage + 1}`} 
           width={600}
           height={600}

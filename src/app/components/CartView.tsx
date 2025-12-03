@@ -5,7 +5,6 @@ import { useUserCart, UserCartResponse, useAddToCart } from '../hooks/useUserCar
 
 export default function CartView() {
   const { data, loading, error } = useUserCart();
-  const { addToCart, loading: addingToCart } = useAddToCart();
 
   const [quantityUpdates, setQuantityUpdates] = useState<{[key: string]: number}>({});
 

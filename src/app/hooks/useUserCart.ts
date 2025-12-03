@@ -77,6 +77,7 @@ export const useRemoveProductFromCart = () => {
 export const useAddToCart = () => {
   const [addToCartMutation, { loading, error }] = useMutation<AddToCartResponse>(ADD_PRODUCT_TO_USER_CART, {
     refetchQueries: [GET_USER_CART],
+    fetchPolicy: 'network-only',
     errorPolicy: 'all',
   });
 

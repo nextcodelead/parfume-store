@@ -21,6 +21,7 @@ interface BackendCartItem {
     name: string;
     brand: { name: string };
     photo: { imageUrl: string } | null;
+    stocksCount: number;
   };
   stock?: Stock;
 }
@@ -41,7 +42,7 @@ export default function CartPage() {
         ...item,
         product: {
           ...item.product,
-          stocksCount: 0 // значение по умолчанию
+          stocksCount: item.product.stocksCount
         }
       }));
       

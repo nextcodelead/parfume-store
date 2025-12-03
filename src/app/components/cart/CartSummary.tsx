@@ -45,7 +45,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
     try {
       const res = await beginBuy({ variables: { products } });
       const payload = res.data?.beginBuy;
-      if (payload && payload.success) {
+      if (payload) {
         // Если сервер вернул redirectUrl — можно перенаправить туда
         if (payload.redirectUrl) {
           router.push(payload.redirectUrl);

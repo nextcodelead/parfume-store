@@ -30,6 +30,7 @@ export const useMeUserCart = () => {
   const isClient = useIsClient();
   return useQuery<MeUserCartResponse>(ME_USER_CART, {
     errorPolicy: 'all',
+    fetchPolicy: 'no-cache',
     skip: !isClient,
   });
 };
