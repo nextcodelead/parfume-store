@@ -37,14 +37,14 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
   const displayOldPrice = product.stocks?.[0]?.cost ?? 0;
 
   return (
-    <div className="relative bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4 group focus-within:ring-2 focus-within:ring-rose-500 h-full flex flex-col">
+    <div className="relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-3 md:p-4 group focus-within:ring-2 focus-within:ring-rose-500 h-full flex flex-col">
       <Link
         href={`/products/${product.pk}`}
         className="absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={`Перейти на страницу товара ${product.name}`}
       />
 
-      <div className="relative z-20 flex flex-col h-full space-y-4">
+      <div className="relative z-20 flex flex-col h-full space-y-3">
         {showDiscount && product.discount && (
           <span className="absolute top-2 right-8 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-30">
             -{product.discount}%
@@ -64,7 +64,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
         </button>
 
         {/* Обложка карточки */}
-        <div className="w-full h-56 overflow-hidden rounded-md">
+        <div className="w-full h-36 sm:h-44 md:h-56 overflow-hidden rounded-md">
           <img 
             src={product.photo ? `https://dataset.uz/${product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"}
             alt={product.name}
@@ -73,22 +73,22 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
         </div>
 
         <div className="space-y-2 flex-1 flex flex-col">
-          <h3 className="text-lg font-semibold text-gray-900 min-h-[48px] flex items-start">
+          <h3 className="text-sm md:text-lg font-semibold text-gray-900 min-h-[42px] flex items-start">
             {product.name}
           </h3>
 
           <div className="mt-auto flex items-center justify-between">
             {showDiscount && product.discount && product.cost ? (
               <div className="flex items-center gap-2">
-                <span className="text-xl font-bold text-rose-600">
+                <span className="text-lg md:text-xl font-bold text-rose-600">
                   {SITE_CONFIG.currency}{displayPrice.toFixed(2)}
                 </span>
-                <span className="text-sm text-gray-500 line-through">
+                <span className="text-xs md:text-sm text-gray-500 line-through">
                   {SITE_CONFIG.currency}{displayOldPrice?.toFixed(2)}
                 </span>
               </div>
             ) : (
-              <span className="text-xl font-bold text-gray-900">
+              <span className="text-lg md:text-xl font-bold text-gray-900">
                 {SITE_CONFIG.currency}{Number(displayPrice).toFixed(2)}
               </span>
             )}
@@ -98,7 +98,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
         {!product.isInMyCart && (
         <div className="pt-2">
           <button 
-            className={`relative z-40 w-full ${COLORS.primary} text-white py-2 rounded-lg transition-colors`}
+            className={`relative z-40 w-full ${COLORS.primary} text-white py-2 text-sm md:text-base rounded-lg transition-colors`}
             type="button" onClick={async () => { await addToCart(product.pk, 1); onAddedToCart?.(); }}
           >
             Добавить в корзину

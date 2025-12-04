@@ -135,7 +135,7 @@ export default function ProductList() {
                     disabled={!product.stocks?.some(stock => stock.quantity > 0)}
                     type="button"
                   >
-                    {product.stocks?.some(stock => stock.quantity > 0) ? 'В корзину' : 'Нет в наличии'}
+                    {product.stocks?.some(stock => stock.quantity > 0) ? 'Добавить в  корзину' : 'Нет в наличии'}
                   </button>
                 </div>
               </div>

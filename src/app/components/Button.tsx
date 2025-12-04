@@ -44,16 +44,16 @@ const Button: React.FC<ButtonProps> = ({
     danger: 'bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg',
   };
 
-  // Size styles
+  // Size styles - уменьшенный шрифт для мобильных
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-    xl: 'px-8 py-4 text-xl',
+    sm: 'px-3 py-1.5 text-xs sm:text-sm',
+    md: 'px-4 py-2 text-sm sm:text-base',
+    lg: 'px-6 py-3 text-base sm:text-lg',
+    xl: 'px-8 py-4 text-lg sm:text-xl',
   };
 
-  // Base styles
-  const baseStyles = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2';
+  // Base styles - добавлен truncate для обрезки длинного текста
+  const baseStyles = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 truncate';
 
   // Width style
   const widthStyle = fullWidth ? 'w-full' : '';
@@ -77,7 +77,7 @@ const Button: React.FC<ButtonProps> = ({
       {isLoading ? (
         <>
           <svg
-            className="animate-spin h-5 w-5"
+            className="animate-spin h-4 w-4 sm:h-5 sm:w-5"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -96,13 +96,13 @@ const Button: React.FC<ButtonProps> = ({
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span>Loading...</span>
+          <span className="truncate">Loading...</span>
         </>
       ) : (
         <>
-          {leftIcon && <span>{leftIcon}</span>}
-          <span>{children}</span>
-          {rightIcon && <span>{rightIcon}</span>}
+          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+          <span className="truncate">{children}</span>
+          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
         </>
       )}
     </button>
@@ -110,72 +110,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-
-
-// ============================================
-// USAGE EXAMPLES
-// ============================================
-
-/*
-import Button from './Button';
-import { ShoppingCart, Heart, ChevronRight } from 'lucide-react';
-
-// Basic usage
-<Button>Click me</Button>
-
-// Different variants
-<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="danger">Danger</Button>
-
-// Different sizes
-<Button size="sm">Small</Button>
-<Button size="md">Medium</Button>
-<Button size="lg">Large</Button>
-<Button size="xl">Extra Large</Button>
-
-// With icons
-<Button leftIcon={<ShoppingCart size={20} />}>
-  Add to Cart
-</Button>
-
-<Button rightIcon={<ChevronRight size={20} />}>
-  Continue
-</Button>
-
-<Button leftIcon={<Heart size={20} />} rightIcon={<ChevronRight size={20} />}>
-  Save & Continue
-</Button>
-
-// Full width
-<Button fullWidth>Full Width Button</Button>
-
-// Loading state
-<Button isLoading>Processing</Button>
-
-// Disabled state
-<Button disabled>Disabled</Button>
-
-// With onClick handler
-<Button onClick={() => console.log('Clicked!')}>
-  Click Me
-</Button>
-
-// Custom styling
-<Button className="shadow-2xl rounded-full">
-  Custom Style
-</Button>
-
-// Combine multiple props
-<Button 
-  variant="secondary" 
-  size="lg" 
-  fullWidth 
-  leftIcon={<ShoppingCart size={24} />}
-  onClick={() => alert('Added to cart!')}
->
-  Add to Cart
-</Button>
-*/
