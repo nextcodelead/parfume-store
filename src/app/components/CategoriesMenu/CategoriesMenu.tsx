@@ -37,18 +37,23 @@ export const CategoriesMenu: React.FC<CategoriesMenuProps> = ({ isOpen, onClose 
 
       {/* Menu Panel */}
       <div
-        className={`fixed left-0 top-0 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} w-full md:w-[320px] ${hoveredCategory ? 'md:w-[800px]' : ''}`}
-        style={{ minWidth: 0 }}
+        className={`fixed left-0 top-0 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ width: hoveredCategory ? '800px' : '320px' }}
       >
         <div className="flex h-full">
           {/* Left Side - Main Categories */}
-          <div className="w-full md:w-80 border-r border-gray-200 flex flex-col">
+          <div className="w-80 border-r border-gray-200 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-3 py-2 md:p-4 border-b bg-white">
+            <div className="flex items-center justify-between p-4 border-b bg-white">
               <div className="flex items-center gap-2">
-                <h2 className="text-base md:text-lg font-bold text-gray-900">Категории</h2>
+                <h2 className="text-lg font-bold text-gray-900"> All Categories</h2>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -96,29 +101,27 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
       console.log('Navigate to:', category.pk);
       onClick();
     }}
-    className={`w-full flex items-center justify-between px-3 py-3 md:p-4 transition-colors text-sm md:text-base`}
+    className={`w-full flex items-center justify-between p-4 transition-colors ${
+      isHovered
+        ? 'bg-rose-50 border-r-4 border-rose-600'
+        : 'hover:bg-gray-50'
+    }`}
   >
-    <div className="flex items-center gap-2 md:gap-3">
-      <span className="text-xl md:text-3xl p-1 md:p-2 rounded-lg">
+    <div className="flex items-center gap-3">
+      {/* <span className={`text-3xl p-2 rounded-lg ${category.color}`}> */}
+      <span className={`text-3xl p-2 rounded-lg red`}>
         {category.iconUrl}
       </span>
-      <button
-        onClick={() => {
-          if (window.innerWidth < 768) {
-            setOpenCategoryMobile((prev) => (prev === category.pk ? null : category.pk));
-          } else {
-            setHoveredCategory(category.pk);
-          }
-        }}
-        className="text-left font-medium text-gray-900 truncate max-w-[120px] md:max-w-none"
-        style={{ fontSize: 'inherit' }}
-      >
+      <span className="font-medium text-gray-900 text-left">
         {category.name}
-      </button>
+      </span>
     </div>
-    <div className="flex items-center gap-2">
-      <ChevronRight size={18} className="text-gray-400" />
-    </div>
+    <ChevronRight 
+      size={20} 
+      className={`transition-colors ${
+        isHovered ? 'text-rose-600' : 'text-gray-400'
+      }`}
+    />
   </button>
 );
 
