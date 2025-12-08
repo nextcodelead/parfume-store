@@ -125,7 +125,6 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
   </button>
 );
 
-// Компонент панели подкатегорий
 interface SubcategoriesPanelProps {
   subcategories: Subcategory[];
   onClose: () => void;

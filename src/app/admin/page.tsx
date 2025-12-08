@@ -1,12 +1,14 @@
 'use client'
 import React, { useState } from 'react';
-import { Users, TrendingUp, Settings } from 'lucide-react';
+import { Users, TrendingUp, Settings, Tag, Layers } from 'lucide-react';
 import Sidebar from '../components/admin/Sidebar';
 import Header from '../components/admin/Header';
 // import DashboardContent from '../components/admin/DashboardContent';
 import ProductsTable from '../components/admin/ProductsTable';
 import OrdersTable from '../components/admin/OrdersTable';
 import ComingSoon from '../components/admin/ComingSoon';
+import CategoriesPage from '../components/admin/CategoriesPage';
+import BrandsPage from '../components/admin/BrandsPage';
 
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -20,8 +22,14 @@ const AdminPanel: React.FC = () => {
       case 'products':
         return <ProductsTable />;
       
+      case 'categories':
+        return <CategoriesPage />;
+      
       case 'orders':
         return <OrdersTable />;
+      
+      case 'brands':
+        return <BrandsPage />;
       
       case 'customers':
         return (
@@ -54,7 +62,6 @@ const AdminPanel: React.FC = () => {
         return null;
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar
