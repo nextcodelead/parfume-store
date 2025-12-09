@@ -42,7 +42,11 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
         href={`/products/${product.pk}`}
         className="absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={`Перейти на страницу товара ${product.name}`}
-      />
+      >
+        <span className="sr-only">
+          Перейти на страницу товара {product.name}
+        </span>
+      </Link>
 
       <div className="relative z-20 flex flex-col h-full space-y-3">
         {showDiscount && product.discount && (
