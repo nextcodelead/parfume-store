@@ -4,7 +4,7 @@ import { Subcategory } from '../../types/graphql';
 // Category тип теперь импортируем из useCategories.ts
 import type { Category as BaseCategory } from '../../hooks/useCategories';
 import { useCategories } from '../../hooks/useCategories';
-
+import Link from 'next/link';
 interface CategoriesMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -157,16 +157,14 @@ const SubcategoriesPanel: React.FC<SubcategoriesPanelProps> = ({ subcategories, 
           </h3>
           <div className="grid grid-cols-2 gap-2">
             {subcat.items.map((item, itemIdx) => (
-              <button
+              <Link
                 key={itemIdx}
-                onClick={() => {
-                  console.log('Navigate to:', item.pk);
-                  onClose();
-                }}
+                href={`/catalog/${item.pk}`}
                 className="text-left px-3 py-2 text-sm text-gray-700 hover:text-rose-600 hover:bg-white rounded-lg transition-colors"
+                aria-label={`Перейти на страницу категории ${item.name}`}
               >
                 {item.name}
-              </button>
+              </Link>
             ))}
           </div>
         </div>

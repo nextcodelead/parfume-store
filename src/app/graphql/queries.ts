@@ -309,3 +309,15 @@ export const ORDER_CARTS = gql`
     }
   }
 `;
+export const PRODUCTS_CATEGORY_PAGE = gql`
+query category($categoryId: Int!, $filters: ProductFilter) {
+  category(id: $categoryId) {
+    name
+    description
+  }
+  products(filters: $filters) {
+    pk
+    name
+  }
+}
+`;

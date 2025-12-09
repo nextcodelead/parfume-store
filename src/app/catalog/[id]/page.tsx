@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { notFound } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import ProductCard from '../../components/ProductCard';
@@ -10,6 +9,7 @@ import Button from '../../components/Button';
 import { GET_PRODUCTS } from '../../graphql/queries';
 import { useIsClient } from '../../hooks/useIsClient';
 import { Product, ProductsResponse } from '../../types/graphql';
+import { useProductsCategoryPage } from '@/app/hooks/useProducts';
 
 const CATEGORY_MAP = {
   men: {
@@ -41,42 +41,37 @@ const CATEGORY_MAP = {
 type CategoryKey = keyof typeof CATEGORY_MAP;
 
 interface CategoryPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }
 
+
 const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
-  const [slug, setSlug] = useState<string>('');
+  const [id, setId] = useState<number | null>(null);
+  const {data: productsData, loading: loadingProducts, error: errorProducts, refetch} = useProductsCategoryPage(id);
   const [isLoadingParams, setIsLoadingParams] = useState(true);
 
   useEffect(() => {
     params.then((resolvedParams) => {
-      setSlug(resolvedParams.slug);
+      setId(Number(resolvedParams.id));
       setIsLoadingParams(false);
     });
   }, [params]);
 
-  const categoryKey = slug?.toLowerCase() as CategoryKey;
-  const config = CATEGORY_MAP[categoryKey];
+  const products = (productsData as ProductsResponse | undefined)?.products ?? [];
 
-  if (!isLoadingParams && !config) {
-    notFound();
+
+  if (errorProducts) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 py-10">
+          <div className="text-rose-600">Ошибка загрузки: {errorProducts.message}</div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
-
-  const isClient = useIsClient();
-  const { data, loading, error, refetch } = useQuery(GET_PRODUCTS, {
-    variables: {
-      filters: {
-        isPublished: { equals: true },
-        ...(config?.filters || {}),
-      },
-      pagination: { limit: 40 },
-    },
-    skip: !isClient || !config,
-  });
-
-  const products = (data as ProductsResponse | undefined)?.products ?? [];
-
-  if (isLoadingParams || !config) {
+  if (isLoadingParams) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -94,18 +89,22 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
       <main className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex flex-wrap items-center gap-4 mb-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-4 py-1 text-sm font-semibold text-rose-600">
-            {config.badge}
+            Test
           </span>
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">{config.title}</h1>
-            <p className="text-gray-600 mt-2">{config.description}</p>
+            {productsData && (
+              <h1 className="text-4xl font-bold text-gray-900">{productsData.category.name}</h1>
+            )}
+            {productsData && productsData.category.description && (
+            <p className="text-gray-600 mt-2">{productsData.category.description}</p>
+            )}
           </div>
         </div>
 
         <div className="flex items-center justify-between bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">В коллекции</h2>
-            <p className="text-sm text-gray-500">{loading ? 'Загружаем...' : `${products.length} товаров`}</p>
+            <p className="text-sm text-gray-500">{loadingProducts ? 'Загружаем...' : `${products.length} товаров`}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => refetch()}>
@@ -117,10 +116,10 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
           </div>
         </div>
 
-        {loading ? (
+        {loadingProducts ? (
           <div className="text-center text-gray-500">Загрузка товаров...</div>
-        ) : error ? (
-          <div className="text-rose-600">Ошибка загрузки: {error.message}</div>
+        ) : errorProducts ? (
+          <div className="text-rose-600">Ошибка загрузки: {errorProducts.message}</div>
         ) : products.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-500">
             В этой категории пока нет товаров.

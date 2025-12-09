@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client/react';
-import { GET_PRODUCT, GET_PRODUCT_CLIENT, GET_PRODUCT_IMAGES, GET_PRODUCT_IMAGES_CLIENT, GET_PRODUCTS, GET_STOCK, GET_STOCKS } from '../graphql/queries';
+import { GET_PRODUCT, GET_PRODUCT_CLIENT, GET_PRODUCT_IMAGES, GET_PRODUCT_IMAGES_CLIENT, GET_PRODUCTS, GET_STOCK, GET_STOCKS, PRODUCTS_CATEGORY_PAGE } from '../graphql/queries';
 import { ADD_OR_UPDATE_IMAGE_PRODUCT, ADD_STOCK, ADMIN_ADD_PRODUCT, DELETE_PRODUCT, DELETE_PRODUCT_IMAGE, DELETE_STOCK, UPDATE_PRODUCT, UPDATE_PRODUCT_IMAGE, UPDATE_STOCK } from '../graphql/mutations';
 
 export interface ProductInput {
@@ -65,6 +65,14 @@ export const useStock = (stockId: number | null) => {
     errorPolicy: 'all',
     variables: { stockId },
     skip: stockId == null,
+  });
+};
+
+export const useProductsCategoryPage = (categoryId: number | null) => {
+  return useQuery(PRODUCTS_CATEGORY_PAGE, {
+    fetchPolicy: 'cache-first',
+    variables: { categoryId, filters: { categoryId: { equals: categoryId }, isPublished: { equals: true } } },
+    skip: categoryId == null,
   });
 };
 
