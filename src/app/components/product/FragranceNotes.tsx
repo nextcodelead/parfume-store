@@ -10,7 +10,6 @@ const FragranceNotes: React.FC<{ notes: Notes }> = ({ notes }) => {
   return (
     <div className="bg-white rounded-xl p-6 shadow-md">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Ноты аромата</h2>
-
       <div className="space-y-6">
         <div>
           <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">

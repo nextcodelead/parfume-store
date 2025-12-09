@@ -31,8 +31,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { addToCart, loading: addingToCart } = useAddToCart();
   if (!product) return null;
-  
-  // Используем price как текущую цену, oldPrice только для отображения
+
   const displayPrice = product.stocks?.[0]?.discount ?? 0;
   const displayOldPrice = product.stocks?.[0]?.cost ?? 0;
 
