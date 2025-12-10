@@ -169,3 +169,53 @@ export const CREATE_ORDER = gql`
     }
   }
 `;
+export const ADD_BRAND = gql`
+  mutation addBrand($input: BrandInput!) {
+    addBrand(input: $input) {
+      pk
+      name
+      siteUrl
+    }
+  }
+`;
+export const UPDATE_BRAND = gql`
+  mutation updateBrand($pk: Int!, $input: BrandInput!) {
+    updateBrand(pk: $pk, input: $input) {
+      pk
+      name
+      siteUrl
+    }
+  }
+`;
+export const DELETE_BRAND = gql`
+  mutation($pk: Int!) {
+    deleteBrand(pk: $pk) {
+      pk
+    }
+  }
+`;
+export const ADD_CATEGORY = gql`
+  mutation addCategory($input: CategoryInput!) {
+    addCategory(input: $input) {
+      pk
+      name
+      description
+    }
+  }
+`;
+export const DELETE_CATEGORY = gql`
+  mutation($pk: Int!) {
+    deleteCategory(pk: $pk) {
+      pk
+    }
+  }
+`;
+export const UPDATE_CATEGORY = gql`
+  mutation($pk: Int!, $input: CategoryInput!) {
+    updateCategory(pk: $pk, input: $input) {
+      pk
+      name
+      description
+    }
+  }
+`;

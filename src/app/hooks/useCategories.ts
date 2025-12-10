@@ -1,6 +1,7 @@
-import { useQuery } from '@apollo/client/react';
-import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS, GET_PRODUCTS_ADMIN, GET_PRODUCTS_COUNT_ADMIN, ADMIN_CREATE_PRODUCT_SELECT_CATEGORY } from '../graphql/queries';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { GET_CATEGORIES, GET_BRANDS, GET_PRODUCTS, GET_PRODUCTS_ADMIN, GET_PRODUCTS_COUNT_ADMIN, ADMIN_CREATE_PRODUCT_SELECT_CATEGORY, MAIN_CATEGORIES } from '../graphql/queries';
 import { useIsClient } from './useIsClient';
+import { ADD_CATEGORY, DELETE_CATEGORY, UPDATE_CATEGORY } from '../graphql/mutations';
 
 export const useCategories = () => {
   const isClient = useIsClient();
@@ -21,13 +22,6 @@ export const useCategories = () => {
 export const useSelectCategories = () => {
   const isClient = useIsClient();
   return useQuery<CategoriesResponse>(ADMIN_CREATE_PRODUCT_SELECT_CATEGORY, {
-    variables: {
-      "filter": {
-        "parentId": {
-          "notEquals": null
-        }
-      }
-    },
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
     skip: !isClient,
@@ -130,6 +124,31 @@ export const useBrands = () => {
     skip: !isClient,
   });
 };
+export const useMainCategories = () => {
+  const isClient = useIsClient();
+  return useQuery(MAIN_CATEGORIES, {
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    skip: !isClient,
+  });
+};
+export const useAddCategory = () => {
+  return useMutation(ADD_CATEGORY, { 
+    errorPolicy: "all" 
+  });
+};
+export const useDeleteCategory = () => {
+  return useMutation(DELETE_CATEGORY, { 
+    errorPolicy: "all" 
+  });
+};
+export const useUpdateCategory = () => {
+  return useMutation(UPDATE_CATEGORY, { 
+    errorPolicy: "all" 
+  });
+};
+
+
 
 // Типы для удобства использования (обновлены под реальную схему)
 export interface Category {

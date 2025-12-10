@@ -321,3 +321,23 @@ query category($categoryId: Int!, $filters: ProductFilter) {
   }
 }
 `;
+export const BRANDS_ADMIN_PAGE = gql`
+query brands {
+  brands {
+    pk
+    name
+    siteUrl
+  }
+}
+`;
+
+export const MAIN_CATEGORIES = gql`
+query mainCategories($filters: CategoryFilter){
+  categories(filters: $filters){
+    pk
+    name
+    description
+    parentId
+  }
+}
+`;

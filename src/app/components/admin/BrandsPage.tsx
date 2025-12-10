@@ -1,29 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, Globe, Search, X, Tag, Check } from 'lucide-react';
+import { useAddBrand, useAdminBrands, useDeleteBrand, useUpdateBrand } from '@/app/hooks/useBrands';
 
 // ============================================
 // TYPES
 // ============================================
 
 type Brand = {
-  id: string;
+  pk: number;
   name: string;
-  slug: string;
-  website?: string;
+  siteUrl: string | null;
 };
-
-// ============================================
-// INITIAL DATA
-// ============================================
-
-const initial: Brand[] = [
-  { id: '1', name: 'Chanel', slug: 'chanel', website: 'https://www.chanel.com' },
-  { id: '2', name: 'Dior', slug: 'dior', website: 'https://www.dior.com' },
-  { id: '3', name: 'Gucci', slug: 'gucci', website: 'https://www.gucci.com' },
-  { id: '4', name: 'Tom Ford', slug: 'tom-ford', website: 'https://www.tomford.com' },
-  { id: '5', name: 'Yves Saint Laurent', slug: 'ysl', website: '' },
-];
-
 // ============================================
 // BUTTON COMPONENT
 // ============================================
@@ -149,7 +136,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
 interface BrandCardProps {
   brand: Brand;
   onEdit: (brand: Brand) => void;
-  onDelete: (id: string) => void;
+  onDelete: (pk: number) => void;
 }
 
 const BrandCard: React.FC<BrandCardProps> = ({ brand, onEdit, onDelete }) => {
@@ -160,17 +147,16 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, onEdit, onDelete }) => {
           <h3 className="text-xl font-bold text-gray-900 mb-2">{brand.name}</h3>
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
             <Tag size={16} />
-            <span className="bg-gray-100 px-2 py-1 rounded">{brand.slug}</span>
           </div>
-          {brand.website && (
+          {brand.siteUrl && (
             <a
-              href={brand.website}
+              href={brand.siteUrl}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm"
             >
               <Globe size={16} />
-              <span className="truncate">{brand.website}</span>
+              <span className="truncate">{brand.siteUrl}</span>
             </a>
           )}
         </div>
@@ -190,7 +176,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, onEdit, onDelete }) => {
           variant="danger"
           size="sm"
           leftIcon={<Trash2 size={16} />}
-          onClick={() => onDelete(brand.id)}
+          onClick={() => onDelete(brand.pk)}
         >
           Удалить
         </Button>
@@ -204,7 +190,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, onEdit, onDelete }) => {
 // ============================================
 
 interface BrandFormProps {
-  form: { name: string; slug: string; website: string };
+  form: { name: string; siteUrl: string };
   onChange: (field: string, value: string) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -221,20 +207,13 @@ const BrandForm: React.FC<BrandFormProps> = ({ form, onChange, onSave, onCancel,
         onChange={(e) => onChange('name', e.target.value)}
         leftIcon={<Tag size={18} />}
       />
-      
-      <Input
-        label="Slug (URL идентификатор)"
-        placeholder="brand-name"
-        value={form.slug}
-        onChange={(e) => onChange('slug', e.target.value)}
-        leftIcon={<Tag size={18} />}
-      />
+    
       
       <Input
         label="Веб-сайт"
         placeholder="https://example.com"
-        value={form.website}
-        onChange={(e) => onChange('website', e.target.value)}
+        value={form.siteUrl}
+        onChange={(e) => onChange('siteUrl', e.target.value)}
         leftIcon={<Globe size={18} />}
       />
 
@@ -264,22 +243,30 @@ const BrandForm: React.FC<BrandFormProps> = ({ form, onChange, onSave, onCancel,
 // ============================================
 
 export default function BrandsPage() {
-  const [items, setItems] = useState<Brand[]>(initial);
+  const {data, loading, error} = useAdminBrands();
+  const [addBrand, {data: addBrandData, loading: addingBrand, error: addBrandError}] = useAddBrand();
+  const [updateBrand, {data: updateBrandData, loading: updatingBrand, error: updateBrandError}] = useUpdateBrand();
+  const [deleteBrand, {data: deleteBrandData, loading: deletingBrand, error: deleteBrandError}] = useDeleteBrand();
+  const [items, setItems] = useState<Brand[]>(data?.brands || []);
   const [editing, setEditing] = useState<Brand | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', slug: '', website: '' });
+  const [form, setForm] = useState({ name: '', siteUrl: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
+  useEffect(() => {
+    setItems(data?.brands || []);
+  }, [data]);
+
   const openAdd = () => {
-    setForm({ name: '', slug: '', website: '' });
+    setForm({ name: '', siteUrl: '' });
     setEditing(null);
     setIsModalOpen(true);
   };
 
   const openEdit = (brand: Brand) => {
     setEditing(brand);
-    setForm({ name: brand.name, slug: brand.slug, website: brand.website || '' });
+    setForm({ name: brand.name, siteUrl: brand.siteUrl || '' });
     setIsModalOpen(true);
   };
 
@@ -287,44 +274,47 @@ export default function BrandsPage() {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim()) {
       alert('Введите название бренда');
       return;
     }
 
     if (editing) {
-      setItems(prev => prev.map(b => b.id === editing.id ? { ...b, ...form } : b));
+      await updateBrand({ variables: { pk: editing.pk, input: { name: form.name, siteUrl: form.siteUrl || null } } })
+      setItems(prev => prev.map(
+        b => b.pk === editing.pk 
+          ? { ...b, name: form.name, siteUrl: form.siteUrl || null } 
+          : b
+      ));
     } else {
+      const res = await addBrand({ variables: { input: { name: form.name, siteUrl: form.siteUrl || null } } })
       const newBrand: Brand = {
-        id: Date.now().toString(),
+        pk: res.data?.addBrand?.pk || Date.now(),
         name: form.name,
-        slug: form.slug || form.name.toLowerCase().replace(/\s+/g, '-'),
-        website: form.website,
+        siteUrl: form.siteUrl || null,
       };
       setItems(prev => [newBrand, ...prev]);
     }
     
     setIsModalOpen(false);
     setEditing(null);
-    setForm({ name: '', slug: '', website: '' });
+    setForm({ name: '', siteUrl: '' });
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
     setEditing(null);
-    setForm({ name: '', slug: '', website: '' });
+    setForm({ name: '', siteUrl: '' });
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (pk: number) => {
     if (!window.confirm('Вы уверены, что хотите удалить этот бренд?')) return;
-    setItems(prev => prev.filter(b => b.id !== id));
+    await deleteBrand({ variables: { pk: pk } });
+    setItems(prev => prev.filter(b => b.pk !== pk));
   };
 
-  const filteredItems = items.filter(brand =>
-    brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    brand.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = data?.brands || [];
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -343,11 +333,11 @@ export default function BrandsPage() {
           </div>
           <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
             <p className="text-green-100 mb-1">С сайтом</p>
-            <p className="text-4xl font-bold">{items.filter(b => b.website).length}</p>
+            <p className="text-4xl font-bold">{items.filter(b => b.siteUrl).length}</p>
           </div>
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
             <p className="text-purple-100 mb-1">Без сайта</p>
-            <p className="text-4xl font-bold">{items.filter(b => !b.website).length}</p>
+            <p className="text-4xl font-bold">{items.filter(b => !b.siteUrl).length}</p>
           </div>
         </div>
 
@@ -399,7 +389,7 @@ export default function BrandsPage() {
         </div>
 
         {/* Content */}
-        {filteredItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <div className="text-6xl mb-4">🏷️</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -419,9 +409,9 @@ export default function BrandsPage() {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map(brand => (
+            {items.map(brand => (
               <BrandCard
-                key={brand.id}
+                key={brand.pk}
                 brand={brand}
                 onEdit={openEdit}
                 onDelete={handleDelete}
@@ -441,26 +431,21 @@ export default function BrandsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredItems.map(brand => (
-                    <tr key={brand.id} className="hover:bg-gray-50 transition-colors">
+                  {items.map(brand => (
+                    <tr key={brand.pk} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="font-semibold text-gray-900">{brand.name}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="bg-gray-100 px-3 py-1 rounded-full text-sm text-gray-700">
-                          {brand.slug}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {brand.website ? (
+                        {brand.siteUrl ? (
                           <a
-                            href={brand.website}
+                            href={brand.siteUrl}
                             target="_blank"
                             rel="noreferrer"
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
                           >
                             <Globe size={16} />
-                            <span className="truncate max-w-xs">{brand.website}</span>
+                            <span className="truncate max-w-xs">{brand.siteUrl}</span>
                           </a>
                         ) : (
                           <span className="text-gray-400">—</span>
@@ -475,7 +460,7 @@ export default function BrandsPage() {
                             <Edit2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(brand.id)}
+                            onClick={() => handleDelete(brand.pk)}
                             className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
                           >
                             <Trash2 size={18} />

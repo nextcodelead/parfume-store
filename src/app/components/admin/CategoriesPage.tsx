@@ -1,28 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, Search, X, Tag, FileText, Check, Layers } from 'lucide-react';
+import { useAddCategory, useDeleteCategory, useMainCategories, useUpdateCategory } from '@/app/hooks/useCategories';
+import CategorySelect from '../CategoriesMenu/CategorySelect';
 
 // ============================================
 // TYPES
 // ============================================
 
 type Category = {
-  id: string;
+  pk: number;
   name: string;
-  slug: string;
-  description?: string;
+  description: string | null;
+  parentId: number | null;
 };
-
-// ============================================
-// INITIAL DATA
-// ============================================
-
-const initial: Category[] = [
-  { id: '1', name: 'Женские', slug: 'womens', description: 'Элегантные женские ароматы' },
-  { id: '2', name: 'Мужские', slug: 'mens', description: 'Стильные мужские парфюмы' },
-  { id: '3', name: 'Унисекс', slug: 'unisex', description: 'Универсальные ароматы для всех' },
-  { id: '4', name: 'Люкс', slug: 'luxury', description: 'Премиальные дизайнерские духи' },
-  { id: '5', name: 'Нишевые', slug: 'niche', description: 'Эксклюзивная парфюмерия' },
-];
 
 // ============================================
 // BUTTON COMPONENT
@@ -177,7 +167,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
 interface CategoryCardProps {
   category: Category;
   onEdit: (category: Category) => void;
-  onDelete: (id: string) => void;
+  onDelete: (pk: number) => void;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete }) => {
@@ -196,9 +186,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
               <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
               <div className="flex items-center gap-1 text-sm text-gray-600">
                 <Tag size={14} />
-                <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded">{category.slug}</span>
               </div>
             </div>
+            {(category.parentId) && (
+              <div className="ml-auto text-sm text-gray-500 italic">
+                Подкатегория
+              </div>
+            )}
           </div>
           
           {category.description && (
@@ -221,7 +215,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
           variant="danger"
           size="sm"
           leftIcon={<Trash2 size={16} />}
-          onClick={() => onDelete(category.id)}
+          onClick={() => onDelete(category.pk)}
         >
           Удалить
         </Button>
@@ -235,8 +229,8 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
 // ============================================
 
 interface CategoryFormProps {
-  form: { name: string; slug: string; description: string };
-  onChange: (field: string, value: string) => void;
+  form: { pk: number | null; name: string; description: string | null, parentId: number | null };
+  onChange: (field: string, value: string | number | null) => void;
   onSave: () => void;
   onCancel: () => void;
   isEditing: boolean;
@@ -253,21 +247,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ form, onChange, onSave, onC
         leftIcon={<Layers size={18} />}
       />
       
-      <Input
-        label="Slug (URL идентификатор)"
-        placeholder="category-name"
-        value={form.slug}
-        onChange={(e) => onChange('slug', e.target.value)}
-        leftIcon={<Tag size={18} />}
-      />
-      
       <Textarea
         label="Описание"
         placeholder="Краткое описание категории..."
-        value={form.description}
+        value={form.description!}
         onChange={(e) => onChange('description', e.target.value)}
         rows={4}
       />
+      <CategorySelect
+      canClear={true}
+        excludes={[form.pk]}
+        value={form.parentId}
+        onChange={(value) => onChange('parentId', value)} />
 
       <div className="flex gap-3 pt-4">
         <Button
@@ -295,68 +286,75 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ form, onChange, onSave, onC
 // ============================================
 
 export default function CategoriesPage() {
-  const [items, setItems] = useState<Category[]>(initial);
+  const {data, loading, error} = useMainCategories();
+  const [addCategory, {data: addCategoryData, loading: addCategoryLoading, error: addCategoryError}] = useAddCategory();
+  const [deleteCategory, {data: deleteCategoryData, loading: deleteCategoryLoading, error: deleteCategoryError}] = useDeleteCategory();
+  const [updateCategory, {data: updateCategoryData, loading: updateCategoryLoading, error: updateCategoryError}] = useUpdateCategory();
+  const [items, setItems] = useState<Category[]>([]);
   const [editing, setEditing] = useState<Category | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', slug: '', description: '' });
+  const [form, setForm] = useState<Category>({ name: '' } as Category);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  const openAdd = () => {
-    setForm({ name: '', slug: '', description: '' });
+  useEffect(() => {
+    if (data && data.categories) {
+      setItems(data.categories);
+    }
+  }, [data]);
+
+  const openAdd = async () => {
+    setForm({ name: '', description: '', parentId: null } as Category);
     setEditing(null);
     setIsModalOpen(true);
   };
 
   const openEdit = (category: Category) => {
     setEditing(category);
-    setForm({ name: category.name, slug: category.slug, description: category.description || '' });
+    setForm(category);
     setIsModalOpen(true);
   };
 
-  const handleFormChange = (field: string, value: string) => {
+  const handleFormChange = (field: string, value: string | number | null) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim()) {
       alert('Введите название категории');
       return;
     }
 
     if (editing) {
-      setItems(prev => prev.map(c => c.id === editing.id ? { ...c, ...form } : c));
+      await updateCategory({ variables: { pk: editing.pk, input: { name: form.name, description: form.description, parentId: form.parentId } } });
+      setItems(prev => prev.map(c => c.pk === editing.pk ? { ...c, ...form } : c));
     } else {
+      const res = await addCategory({ variables: { input: { name: form.name, description: form.description, parentId: form.parentId } } });
       const newCategory: Category = {
-        id: Date.now().toString(),
+        pk: res.data.addCategory.pk,
         name: form.name,
-        slug: form.slug || form.name.toLowerCase().replace(/\s+/g, '-'),
         description: form.description,
+        parentId: form.parentId,
       };
       setItems(prev => [newCategory, ...prev]);
     }
     
     setIsModalOpen(false);
     setEditing(null);
-    setForm({ name: '', slug: '', description: '' });
+    setForm({ name: '', description: null, parentId: null } as Category);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
     setEditing(null);
-    setForm({ name: '', slug: '', description: '' });
+    setForm({ name: '', description: null, parentId: null } as Category);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (pk: number) => {
     if (!window.confirm('Вы уверены, что хотите удалить эту категорию?')) return;
-    setItems(prev => prev.filter(c => c.id !== id));
+    await deleteCategory({ variables: { pk: pk } });
+    setItems(prev => prev.filter(c => c.pk !== pk));
   };
-
-  const filteredItems = items.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -431,7 +429,7 @@ export default function CategoriesPage() {
         </div>
 
         {/* Content */}
-        {filteredItems.length === 0 ? (
+        {!items || items.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <div className="text-6xl mb-4">📁</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -451,9 +449,9 @@ export default function CategoriesPage() {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map(category => (
+            {items.map(category => (
               <CategoryCard
-                key={category.id}
+                key={category.pk}
                 category={category}
                 onEdit={openEdit}
                 onDelete={handleDelete}
@@ -473,15 +471,10 @@ export default function CategoriesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredItems.map(category => (
-                    <tr key={category.id} className="hover:bg-gray-50 transition-colors">
+                  {items.map(category => (
+                    <tr key={category.pk} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="font-semibold text-gray-900">{category.name}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-                          {category.slug}
-                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-gray-700 text-sm">
@@ -497,7 +490,7 @@ export default function CategoriesPage() {
                             <Edit2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(category.id)}
+                            onClick={() => handleDelete(category.pk)}
                             className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
                           >
                             <Trash2 size={18} />
