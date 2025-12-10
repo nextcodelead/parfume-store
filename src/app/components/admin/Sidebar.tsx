@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, LogOut, Tag, Layers } from 'lucide-react';
+import { X, LogOut, Tag, Layers, Box, BoxIcon } from 'lucide-react';
 import { MenuItem } from '../../types/admin';
 import { MENU_ITEMS } from '../../data/adminData';
 import Link from 'next/link';
@@ -57,8 +57,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isMobileOpen,
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
             >
-              {item.icon}
-              <span>{item.label}</span>
+              <BoxIcon/>
+              <span>Товары</span>
             </button>
           ))}
 
