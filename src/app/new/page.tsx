@@ -4,10 +4,9 @@ import Footer from '../components/layout/Footer';
 import { useNewProducts } from '../hooks/useAllProducts';
 import { Product } from '../types/graphql';
 import ProductCard from '../components/ProductCard';
-import Link from 'next/link';
 
-export default function NewProductsPage(): React.FC {
-  const { data, loading, error } = useNewProducts();
+export default function NewProductsPage() {
+  const { data } = useNewProducts();
   const newProducts = (data as { products?: Product[] })?.products || [];
 
   return (
