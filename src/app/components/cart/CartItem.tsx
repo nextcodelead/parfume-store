@@ -34,62 +34,88 @@ export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQu
     }
   }, [selectedStock, quantity]);
 
-  {JSON.stringify(selectedStock)}
   return (
-    <div className={`bg-white rounded-lg p-4 shadow-md flex gap-4 ${!haveInStock ? "opacity-60" : ""}`}>
+    <div className={`bg-white rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-3 sm:gap-4 ${!haveInStock ? "opacity-60" : ""}`}>
       {/* Image */}
-      <div className="bg-gray-100 rounded-lg w-24 h-24 flex items-center justify-center text-4xl flex-shrink-0">
-        <img src={cart.product.photo ? `https://dataset.uz/${cart.product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"} alt={cart.product.brand.name} className="max-w-full max-h-full" />
+      <div className="bg-gray-100 rounded-lg w-full sm:w-20 md:w-24 h-32 sm:h-20 md:h-24 flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <img 
+          src={cart.product.photo ? `https://dataset.uz/${cart.product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"} 
+          alt={cart.product.brand.name} 
+          className="w-full h-full object-cover" 
+        />
       </div>
-      <div className="flex-1">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <p className="text-xs text-gray-600 mb-1">{cart.product.brand.name}</p>
-            <h3 className="font-semibold text-gray-900">{cart.product.name}</h3>
+      
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex justify-between items-start mb-2 sm:mb-3 gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">{cart.product.brand.name}</p>
+            <h3 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-2">{cart.product.name}</h3>
           </div>
           <button
             onClick={() => onRemove(cart.pk)}
-            className="text-gray-400 hover:text-red-600 transition-colors"
+            className="text-gray-400 hover:text-red-600 transition-colors flex-shrink-0 p-1"
+            aria-label="Удалить товар"
           >
-            <X size={20} />
+            <X size={18} className="sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {!haveInStock && (
-          <div className="flex items-center gap-1 text-red-600 text-sm mb-2">
-            <AlertCircle size={16} />
-           <span>Нет в наличии</span>
+          <div className="flex items-center gap-1.5 text-red-600 text-xs sm:text-sm mb-2 sm:mb-3">
+            <AlertCircle size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
+            <span>Нет в наличии</span>
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          {/* stock */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mt-auto">
+          {/* Stock Select */}
           {cart.product.stocksCount > 0 && (
-          <StockSelect productId={cart.product.pk} onChange={(value) => {setSelectedStock(value); onSetStock(cart.pk, value);}} />
+            <div className="flex-shrink-0 sm:min-w-[140px]">
+              <StockSelect 
+                productId={cart.product.pk} 
+                onChange={(value) => {
+                  setSelectedStock(value); 
+                  onSetStock(cart.pk, value);
+                }} 
+              />
+            </div>
           )}
+          
           {/* Quantity */}
-          <div className="flex items-center border border-gray-300 rounded-lg">
+          <div className="flex items-center border border-gray-300 rounded-lg self-start sm:self-auto">
             <button
-              onClick={() => { onUpdateQuantity(cart.pk, Math.max(1, quantity - 1)); setQuantity(Math.max(1, quantity - 1)); }}
-              className="p-2 hover:bg-gray-100 transition-colors"
-              disabled={!haveInStock}
+              onClick={() => { 
+                const newQty = Math.max(1, quantity - 1);
+                onUpdateQuantity(cart.pk, newQty); 
+                setQuantity(newQty); 
+              }}
+              className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!haveInStock || quantity <= 1}
+              aria-label="Уменьшить количество"
             >
-              <Minus size={16} />
+              <Minus size={14} className="sm:w-4 sm:h-4" />
             </button>
-            <span className="px-4 font-semibold">{quantity}</span>
+            <span className="px-3 sm:px-4 font-semibold text-sm sm:text-base min-w-[36px] sm:min-w-[44px] text-center">{quantity}</span>
             <button
-              onClick={() => { onUpdateQuantity(cart.pk, quantity + 1); setQuantity(quantity + 1); }}
-              className="p-2 hover:bg-gray-100 transition-colors"
+              onClick={() => { 
+                const newQty = quantity + 1;
+                onUpdateQuantity(cart.pk, newQty); 
+                setQuantity(newQty); 
+              }}
+              className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!haveInStock}
+              aria-label="Увеличить количество"
             >
-              <Plus size={16} />
+              <Plus size={14} className="sm:w-4 sm:h-4" />
             </button>
           </div>
 
           {/* Price */}
-          <div className="text-right">
-            <p className="text-lg font-bold text-gray-900">${subtotal.toFixed(2)}</p>
-            <p className="text-xs text-gray-600">${selectedStock?.cost.toFixed(2)} каждый</p>
+          <div className="text-left sm:text-right flex-shrink-0">
+            <p className="text-base sm:text-lg font-bold text-gray-900">${subtotal.toFixed(2)}</p>
+            {selectedStock?.cost && (
+              <p className="text-xs text-gray-600">${selectedStock.cost.toFixed(2)} каждый</p>
+            )}
           </div>
         </div>
       </div>

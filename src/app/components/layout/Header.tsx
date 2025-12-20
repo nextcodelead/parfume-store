@@ -109,7 +109,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }
               </li>
               <li><Link href="/new" className="hover:text-rose-600 block px-2 py-2">Новинки</Link></li>
               <li><Link href="/sale" className="hover:text-rose-600 block px-2 py-2">Акции</Link></li>
-              <li><Link href="/contacts" className="hover:text-rose-600 block px-2 py-2">О нас</Link></li>
+              <li><Link href="/about-us" className="hover:text-rose-600 block px-2 py-2">О нас</Link></li>
               <li className="md:hidden">
                 <button
                   onClick={() => { setIsMenuOpen(false); goToPage('cart'); }}

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSelectCategories } from "@/app/hooks/useCategories";
 import type { Category } from "@/app/hooks/useCategories";
 
@@ -10,12 +11,17 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ value, onChange }) => {
   const { data, loading, error } = useSelectCategories();
   const categories = data?.categories || [];
 
+  // Установить значение по умолчанию только один раз при монтировании, если значение не задано
+  useEffect(() => {
+    if (value === null && categories.length > 0) {
+      onChange(Number(categories[0].pk));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories.length]); // Запускать только когда категории загружены (onChange не включаем в зависимости, так как это стабильная функция)
+
   if (loading) return <p>Loading categories...</p>;
   if (error) return <p>Error loading categories: {error.message}</p>;
   const selectedValue = value ?? (categories.length > 0 ? Number(categories[0].pk) : "");
-  if (value === null && categories.length > 0) {
-    onChange(Number(categories[0].pk));
-  }
 
   return (
     <div className="w-full max-w-sm">

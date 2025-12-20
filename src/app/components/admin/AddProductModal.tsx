@@ -95,18 +95,18 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, productId, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/70 backdrop-blur">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-100 flex items-start justify-between bg-gradient-to-r from-rose-50 to-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/70 backdrop-blur p-4">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col">
+        <div className="p-4 sm:p-6 border-b border-gray-100 flex items-start justify-between bg-gradient-to-r from-rose-50 to-white">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-rose-500 font-semibold mb-1 flex items-center gap-2">
               <Sparkles size={14} />
               {productId ? 'Редактирование' : 'Новый продукт'}
             </p>
-            <h2 className="text-2xl font-semibold text-gray-900">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
               {productId ? 'Обновите карточку товара' : 'Создайте карточку товара'}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">
               Заполните основные данные, чтобы товар сразу появился в каталоге.
             </p>
           </div>
@@ -119,8 +119,8 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, productId, on
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-6">
-          <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-5">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50 space-y-4 sm:space-y-6">
+          <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5 space-y-4 sm:space-y-5">
             <div className="flex items-center gap-2 text-gray-500 text-sm font-semibold uppercase tracking-wide">
               <Tag size={16} className="text-rose-500" />
               Основная информация
