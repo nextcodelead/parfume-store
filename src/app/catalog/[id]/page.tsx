@@ -1,49 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@apollo/client/react';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/ProductCard';
 import Button from '../../components/Button';
-import { GET_PRODUCTS } from '../../graphql/queries';
-import { useIsClient } from '../../hooks/useIsClient';
-import { Product, ProductsResponse } from '../../types/graphql';
+import { Product } from '../../types/graphql';
 import { useProductsCategoryPage } from '@/app/hooks/useProducts';
-
-const CATEGORY_MAP = {
-  men: {
-    title: 'Мужские ароматы',
-    description: 'Брутальные композиции для уверенных мужчин.',
-    badge: 'MEN',
-    filters: {
-      sex: { equals: 'MALE' },
-    },
-  },
-  women: {
-    title: 'Женские ароматы',
-    description: 'Нежные и элегантные парфюмы на каждый день и особые случаи.',
-    badge: 'WOMEN',
-    filters: {
-      sex: { equals: 'FEMALE' },
-    },
-  },
-  unisex: {
-    title: 'Унисекс коллекция',
-    description: 'Современные композиции без границ и правил.',
-    badge: 'UNISEX',
-    filters: {
-      sex: { equals: 'GENERAL' },
-    },
-  },
-} as const;
-
-type CategoryKey = keyof typeof CATEGORY_MAP;
 
 interface CategoryPageProps {
   params: Promise<{ id: string }>;
 }
 
+interface CategoryPageData {
+  category?: {
+    name: string;
+    description?: string;
+  };
+  products?: Product[];
+}
 
 const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
   const [id, setId] = useState<number | null>(null);
@@ -57,7 +32,8 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
     });
   }, [params]);
 
-  const products = (productsData as ProductsResponse | undefined)?.products ?? [];
+  const categoryData = productsData as CategoryPageData | undefined;
+  const products = categoryData?.products ?? [];
 
 
   if (errorProducts) {
@@ -92,11 +68,11 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
             Test
           </span>
           <div>
-            {productsData && (
-              <h1 className="text-4xl font-bold text-gray-900">{productsData.category.name}</h1>
+            {categoryData?.category && (
+              <h1 className="text-4xl font-bold text-gray-900">{categoryData.category.name}</h1>
             )}
-            {productsData && productsData.category.description && (
-            <p className="text-gray-600 mt-2">{productsData.category.description}</p>
+            {categoryData?.category?.description && (
+            <p className="text-gray-600 mt-2">{categoryData.category.description}</p>
             )}
           </div>
         </div>
@@ -119,7 +95,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
         {loadingProducts ? (
           <div className="text-center text-gray-500">Загрузка товаров...</div>
         ) : errorProducts ? (
-          <div className="text-rose-600">Ошибка загрузки: {errorProducts.message}</div>
+          <div className="text-rose-600">Ошибка загрузки товаров</div>
         ) : products.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-500">
             В этой категории пока нет товаров.
