@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { ShoppingBag } from "lucide-react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 import WishlistItem from "../components/wishlist/WishlistItem";
 import Button from "../components/Button";
 import EmptyState from "../components/EmptyState";

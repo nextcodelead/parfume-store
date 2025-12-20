@@ -1,12 +1,12 @@
 'use client'
 import React, { useState } from 'react';
 import { ShoppingCart, Search, Menu, X, Heart } from 'lucide-react';
-import { CART_ITEMS } from "../data/cartProductsData";
-import { WISHLIST_ITEMS } from "../data/wishListData";
+import { CART_ITEMS } from "../../data/cartProductsData";
+import { WISHLIST_ITEMS } from "../../data/wishListData";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
-import { CategoriesMenu } from '../components/CategoriesMenu/CategoriesMenu'; // Импорт компонента категорий
-import { useMeMain } from '../hooks/useMe';
+import { CategoriesMenu } from '../CategoriesMenu/CategoriesMenu'; // Импорт компонента категорий
+import { useMeMain } from '../../hooks/useMe';
 
 interface SiteConfig {
   brandName: string;
@@ -107,9 +107,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }
                   Каталог
                 </button>
               </li>
-              <li><Link href="#new" className="hover:text-rose-600 block px-2 py-2">Новинки</Link></li>
-              <li><Link href="#sale" className="hover:text-rose-600 block px-2 py-2">Акции</Link></li>
-              <li><Link href="/#about" className="hover:text-rose-600 block px-2 py-2">О нас</Link></li>
+              <li><Link href="/new" className="hover:text-rose-600 block px-2 py-2">Новинки</Link></li>
+              <li><Link href="/sale" className="hover:text-rose-600 block px-2 py-2">Акции</Link></li>
+              <li><Link href="/contacts" className="hover:text-rose-600 block px-2 py-2">О нас</Link></li>
               <li className="md:hidden">
                 <button
                   onClick={() => { setIsMenuOpen(false); goToPage('cart'); }}

@@ -1,11 +1,10 @@
 'use client';
 import React from 'react';
-import Footer from './components/Footer';
+import Footer from './components/layout/Footer';
 import ProductCard from './components/ProductCard';
-import Header from './components/Header';
+import Header from './components/layout/Header';
 import { useAllProducts, useNewProducts } from './hooks/useAllProducts';
 import { Product } from './types/graphql';
-import Link from "next/link";
 
 const App: React.FC = () => {
   const { data, loading, error } = useAllProducts();
@@ -50,13 +49,11 @@ const App: React.FC = () => {
           ) : newArrivals.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {newArrivals.map((product: Product) => (
-                <Link
+                <ProductCard 
                   key={`new-${product.pk}`}
-                  href={`/products/${product.pk}`}
-                  className="block"
-                >
-                  <ProductCard product={transformProductForCard(product)} onAddedToCart={() => { refetchNewProducts();  }} />
-                </Link>
+                  product={transformProductForCard(product)} 
+                  onAddedToCart={() => { refetchNewProducts();  }} 
+                />
               ))}
             </div>
           ) : (
@@ -78,16 +75,11 @@ const App: React.FC = () => {
           ) : promoProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {promoProducts.map((product: Product) => (
-                <Link
+                <ProductCard
                   key={`promo-${product.pk}`}
-                  href={`/products/${product.pk}`}
-                  className="block"
-                >
-                  <ProductCard
-                    product={transformProductForCard(product)}
-                    showDiscount
-                  />
-                </Link>
+                  product={transformProductForCard(product)}
+                  showDiscount
+                />
               ))}
             </div>
           ) : (
@@ -106,13 +98,10 @@ const App: React.FC = () => {
           ) : allProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {allProducts.map((product: Product) => (
-                <Link
+                <ProductCard 
                   key={product.pk}
-                  href={`/products/${product.pk}`}
-                  className="block"
-                >
-                  <ProductCard product={transformProductForCard(product)} />
-                </Link>
+                  product={transformProductForCard(product)} 
+                />
               ))}
             </div>
           ) : (

@@ -213,7 +213,7 @@ export interface ProductClientResponse {
     brand: {
       name: string;
     };
-    categoryRoute: Array<{
+    categoryRoute?: Array<{
       name: string;
     }>;
     starsRating: number;

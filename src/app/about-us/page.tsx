@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, FormEvent } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 import { Mail, Phone, MapPin, Clock, Send, MessageSquare, User, CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
 
@@ -46,13 +46,6 @@ const ContactsPage: React.FC = () => {
       content: 'Rabota68@mail.ru',
       link: 'mailto:Rabota68@mail.ru',
       color: 'bg-rose-50 text-rose-600'
-    },
-    {
-      icon: <MapPin size={24} />,
-      title: 'Адрес',
-      content: '123 Luxury Street, New York, NY 10001',
-      link: '#',
-      color: 'bg-green-50 text-green-600'
     },
     {
       icon: <Clock size={24} />,
@@ -110,7 +103,7 @@ const ContactsPage: React.FC = () => {
             </div>
 
             {/* Социальные сети */}
-            <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-lg p-8 text-white">
+            {/* <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-lg p-8 text-white">
               <h2 className="text-2xl font-bold mb-4">Мы в социальных сетях</h2>
               <p className="text-rose-100 mb-6">
                 Следите за нашими новинками и акциями в социальных сетях
@@ -129,7 +122,7 @@ const ContactsPage: React.FC = () => {
                   Facebook
                 </a>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Форма обратной связи */}
@@ -235,7 +228,7 @@ const ContactsPage: React.FC = () => {
         </div>
 
         {/* Карта (заглушка) */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        {/* <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="bg-gray-200 h-96 flex items-center justify-center">
             <div className="text-center text-gray-500">
               <MapPin size={48} className="mx-auto mb-4 text-gray-400" />
@@ -243,7 +236,7 @@ const ContactsPage: React.FC = () => {
               <p className="text-sm mt-2">123 Luxury Street, New York, NY 10001</p>
             </div>
           </div>
-        </div>
+        </div> */}
       </main>
 
       <Footer />

@@ -214,9 +214,11 @@ export const GET_PRODUCT_CLIENT = gql`
       brand {
         name
       }
-      categoryRoute {
-        name
-      }
+      # categoryRoute temporarily removed due to backend lazy-loading error
+      # The backend resolver needs to eagerly load the parent relationship
+      # categoryRoute {
+      #   name
+      # }
       starsRating
       name
       countReviews

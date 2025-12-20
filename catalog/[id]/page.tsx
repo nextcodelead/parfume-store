@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
-import ProductCard from '../../components/ProductCard';
-import Button from '../../components/Button';
+import Header from '../../src/app/components/layout/Header';
+import Footer from '../../src/app/components/layout/Footer';
+import ProductCard from '../../src/app/components/ProductCard';
+import Button from '../../src/app/components/Button';
 import { GET_PRODUCTS } from '../../graphql/queries';
 import { useIsClient } from '../../hooks/useIsClient';
 import { Product, ProductsResponse } from '../../types/graphql';
