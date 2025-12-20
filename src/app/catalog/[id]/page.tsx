@@ -41,7 +41,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <main className="max-w-7xl mx-auto px-4 py-10">
-          <div className="text-rose-600">Ошибка загрузки: {errorProducts.message}</div>
+          <div className="text-rose-600">Ошибка загрузки</div>
         </main>
         <Footer />
       </div>
