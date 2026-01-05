@@ -1,11 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Tag, Package, Gift, ArrowRight } from "lucide-react";
+import { Package, Gift, ArrowRight } from "lucide-react";
 import  Button  from "../Button";
 import { SHIPPING_OPTIONS } from "../../data/shippingOptions";
-import Link from "next/link";
-import { useBeginBuy, useOrderCarts } from "@/app/hooks/useBuy";
+import { useBeginBuy } from "@/app/hooks/useBuy";
 import { UserCartEntry } from "@/app/types/graphql";
 import type { Stock } from "@/app/types/graphql";
 
@@ -15,10 +14,9 @@ type CartSummaryProps = {
 };
 
 export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
-  const [promoCode, setPromoCode] = useState("");
   const [selectedShipping, setSelectedShipping] = useState("standard");
-  const [discount, setDiscount] = useState(0);
-  const [beginBuy, {loading, error}] = useBeginBuy();
+  const [discount] = useState(0);
+  const [beginBuy, {loading}] = useBeginBuy();
   
 
   const subtotal = items.reduce((sum, item) => sum + (item.stock?.cost ?? 0) * item.count, 0);
@@ -26,14 +24,6 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax - discount;
   const router = useRouter();
-
-  const applyPromoCode = () => {
-    if (promoCode.toUpperCase() === "SAVE10") {
-      setDiscount(subtotal * 0.1);
-    } else {
-      alert("Invalid promo code");
-    }
-  };
 
   const beginProcessBuy = async () => {
     // Явно типизируем payload для мутации
@@ -65,92 +55,81 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-md sticky top-24">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Итог заказа</h2>
+    <div className="bg-white rounded-lg p-4 sm:p-5 lg:p-6 shadow-md lg:sticky lg:top-24">
+      <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-5">Итог заказа</h2>
 
-      <div className="space-y-3 mb-4 pb-4 border-b">
-        <div className="flex justify-between text-gray-700">
-          <span>Сумма ({items.length} без доставки)</span>
-          <span>${subtotal.toFixed(2)}</span>
+      <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-5 pb-4 sm:pb-5 border-b">
+        <div className="flex justify-between text-sm sm:text-base text-gray-700">
+          <span>Сумма ({items.length} {items.length === 1 ? 'товар' : items.length < 5 ? 'товара' : 'товаров'})</span>
+          <span className="font-semibold">${subtotal.toFixed(2)}</span>
         </div>
 
         {/* Shipping */}
         <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">📦 Доставка</label>
-          {SHIPPING_OPTIONS.map((option) => (
-            <label key={option.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
-              <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="shipping"
-                  value={option.id}
-                  checked={selectedShipping === option.id}
-                  onChange={(e) => setSelectedShipping(e.target.value)}
-                  className="text-rose-600"
-                />
-                <div>
-                  <p className="text-sm font-medium">{option.name}</p>
-                  <p className="text-xs text-gray-600">{option.days}</p>
+          <label className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">📦 Доставка</label>
+          <div className="space-y-1.5 sm:space-y-2">
+            {SHIPPING_OPTIONS.map((option) => (
+              <label 
+                key={option.id} 
+                className="flex items-center justify-between p-2 sm:p-2.5 hover:bg-gray-50 rounded cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value={option.id}
+                    checked={selectedShipping === option.id}
+                    onChange={(e) => setSelectedShipping(e.target.value)}
+                    className="text-rose-600 flex-shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium truncate">{option.name}</p>
+                    <p className="text-xs text-gray-600">{option.days}</p>
+                  </div>
                 </div>
-              </div>
-              <span className="text-sm font-semibold">${option.price.toFixed(2)}</span>
-            </label>
-          ))}
+                <span className="text-xs sm:text-sm font-semibold flex-shrink-0 ml-2">${option.price.toFixed(2)}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
-        <div className="flex justify-between text-gray-700">
+        <div className="flex justify-between text-sm sm:text-base text-gray-700">
           <span>Налог (10%)</span>
-          <span>${tax.toFixed(2)}</span>
+          <span className="font-semibold">${tax.toFixed(2)}</span>
         </div>
 
         {discount > 0 && (
-          <div className="flex justify-between text-green-600">
+          <div className="flex justify-between text-sm sm:text-base text-green-600">
             <span>Скидка</span>
-            <span>-${discount.toFixed(2)}</span>
+            <span className="font-semibold">-${discount.toFixed(2)}</span>
           </div>
         )}
       </div>
 
-      {/* Promo */}
-      {/* <div className="mb-4 pb-4 border-b">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-            placeholder="Promo code"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
-          />
-          <Button variant="outline" size="sm" onClick={applyPromoCode}>
-            Применить
-          </Button>
-        </div>
-        <p className="text-xs text-gray-600 mt-2">
-          <Tag size={12} className="inline" /> Попробуйте промокод: SAVE10
-        </p>
-      </div> */}
-
-      <div className="flex justify-between items-center text-xl font-bold text-gray-900 mb-6">
+      <div className="flex justify-between items-center text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
         <span>Итого</span>
         <span>${total.toFixed(2)}</span>
       </div>
 
-      <Button variant="primary" size="lg" fullWidth rightIcon={<ArrowRight size={20} />}>
-      <button onClick={beginProcessBuy} className="flex items-center justify-center w-full">
-        Перейти к оформлению заказа
-      </button>
-      {/* <Link href="/checkout" className="flex items-center justify-center w-full">
-        Перейти к оформлению заказа
-      </Link> */}
+      <Button 
+        variant="primary" 
+        size="lg" 
+        fullWidth 
+        rightIcon={<ArrowRight size={18} className="sm:w-5 sm:h-5" />}
+        onClick={beginProcessBuy}
+        disabled={loading}
+        className="w-full"
+      >
+        {loading ? 'Обработка...' : 'Перейти к оформлению заказа'}
       </Button>
 
-      <div className="mt-6 space-y-2 text-sm text-gray-600">
-        <div className="flex items-center gap-2">
-          <Package size={16} className="text-green-600" />
+      <div className="mt-4 sm:mt-6 space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-600">
+        <div className="flex items-start gap-2">
+          <Package size={14} className="text-green-600 flex-shrink-0 mt-0.5 sm:w-4 sm:h-4" />
           <span>Бесплатный возврат в течение 30 дней</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Gift size={16} className="text-purple-600" />
+        <div className="flex items-start gap-2">
+          <Gift size={14} className="text-purple-600 flex-shrink-0 mt-0.5 sm:w-4 sm:h-4" />
           <span>Доступна бесплатная подарочная упаковка</span>
         </div>
       </div>

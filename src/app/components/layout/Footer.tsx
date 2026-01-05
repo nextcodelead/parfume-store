@@ -13,8 +13,8 @@ const SITE_CONFIG: SiteConfig = {
   brandName: "Essence Luxe",
   logo: "🌸",
   tagline: "Откройте свой неповторимый аромат",
-  contactEmail: "info@essenceluxe.com",
-  contactPhone: "+1 (555) 123-4567"
+  contactEmail: "Rabota@mail.ru",
+  contactPhone: "+79031535260"
 };
 
 const Footer: React.FC = () => (
@@ -31,25 +31,13 @@ const Footer: React.FC = () => (
           <p className="text-gray-400 text-sm leading-relaxed">{SITE_CONFIG.tagline}</p>
         </div>
 
-        {/* Быстрые ссылки */}
         <div>
           <h4 className="font-semibold mb-4 text-lg">Быстрые ссылки</h4>
           <ul className="space-y-2 text-gray-400 text-sm">
-            <li><Link href="/#about" className="hover:text-white transition">О нас</Link></li>
-            <li><Link href="/#catalog" className="hover:text-white transition">Магазин</Link></li>
-            <li><Link href="/#new" className="hover:text-white transition">Новинки</Link></li>
-            <li><Link href="/#sale" className="hover:text-white transition">Скидки</Link></li>
-          </ul>
-        </div>
-
-        {/* Служба поддержки */}
-        <div>
-          <h4 className="font-semibold mb-4 text-lg">Служба поддержки</h4>
-          <ul className="space-y-2 text-gray-400 text-sm">
-            <li><a href="#" className="hover:text-white transition">Информация о доставке</a></li>
-            <li><a href="#" className="hover:text-white transition">Возвраты</a></li>
-            <li><a href="#" className="hover:text-white transition">Часто задаваемые вопросы</a></li>
-            <li><a href="#" className="hover:text-white transition">Таблица размеров</a></li>
+            <li><Link href="/about-us" className="hover:text-white transition">О нас</Link></li>
+            <li><Link href="/catalog" className="hover:text-white transition">Магазин</Link></li>
+            <li><Link href="/new" className="hover:text-white transition">Новинки</Link></li>
+            <li><Link href="/sale" className="hover:text-white transition">Скидки</Link></li>
           </ul>
         </div>
 
@@ -69,10 +57,10 @@ const Footer: React.FC = () => (
         <p className="text-center md:text-left">
           &copy; 2025 {SITE_CONFIG.brandName}. Все права защищены.
         </p>
-        <div className="flex gap-6">
+        {/* <div className="flex gap-6">
           <a href="#" className="hover:text-white transition">Политика конфиденциальности</a>
           <a href="#" className="hover:text-white transition">Условия использования</a>
-        </div>
+        </div> */}
       </div>
     </div>
   </footer>

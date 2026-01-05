@@ -42,3 +42,21 @@ export const useNewProducts = () => {
     skip: !isClient
   });
 };
+
+export const useSaleProducts = () => {
+  const isClient = useIsClient();
+  
+  return useQuery(GET_PRODUCTS, {
+    variables: {
+      filters: {
+        isPublished: {
+          equals: true
+        }
+      },
+      pagination: { limit: 100 }
+    },
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    skip: !isClient
+  });
+};

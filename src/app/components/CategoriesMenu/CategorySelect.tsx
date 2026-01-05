@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSelectCategories } from "@/app/hooks/useCategories";
 import type { Category } from "@/app/hooks/useCategories";
 import { useState } from "react";
@@ -14,6 +15,14 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ canClear = false, exclu
   const additionalEmptyForSelect = canClear ? [{pk: -1, name: "Ничего"} as Category] : [];
   const categories = additionalEmptyForSelect.concat(data?.categories.filter(category => !excludes.includes(category.pk)) || []);
   const [selectedValue, setSelectedValue] = useState<number>(-1);
+
+  // Установить значение по умолчанию только один раз при монтировании, если значение не задано
+  useEffect(() => {
+    if (value === null && categories.length > 0) {
+      onChange(Number(categories[0].pk));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories.length]); // Запускать только когда категории загружены (onChange не включаем в зависимости, так как это стабильная функция)
 
   if (loading) return <p>Loading categories...</p>;
   if (error) return <p>Error loading categories: {error.message}</p>;
@@ -40,7 +49,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ canClear = false, exclu
       <select
         id="category"
         value={selectedValue!}
-        onChange={(e) => onChange(e.target.value != -1 ? Number(e.target.value) : null)}
+        onChange={(e) => onChange(+e.target.value != -1 ? Number(e.target.value) : null)}
         className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         {categories.map((category: Category) => (

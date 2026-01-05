@@ -142,16 +142,17 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-6 border-b">
-            <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900">{title}</h3>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Закрыть"
             >
               <X size={20} />
             </button>
           </div>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {children}
           </div>
         </div>
@@ -175,17 +176,18 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
   const randomIcon = icons[Math.floor(Math.random() * icons.length)];
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-6 border border-gray-200 hover:border-purple-300 group">
-      <div className="flex items-start justify-between mb-4">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-4 sm:p-6 border border-gray-200 hover:border-purple-300 group">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center text-2xl">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center text-xl sm:text-2xl flex-shrink-0">
               {randomIcon}
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-              <div className="flex items-center gap-1 text-sm text-gray-600">
-                <Tag size={14} />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">{category.name}</h3>
+              <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600 mt-1">
+                <Tag size={12} className="sm:w-3.5 sm:h-3.5" />
+                {/* <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs sm:text-sm">{category.slug}</span> */}
               </div>
             </div>
             {(category.parentId) && (
@@ -196,12 +198,12 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
           </div>
           
           {category.description && (
-            <p className="text-gray-600 text-sm mb-4">{category.description}</p>
+            <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{category.description}</p>
           )}
         </div>
       </div>
       
-      <div className="flex gap-2 pt-4 border-t opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex gap-2 pt-3 sm:pt-4 border-t opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           variant="ghost"
           size="sm"
@@ -256,7 +258,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ form, onChange, onSave, onC
       />
       <CategorySelect
       canClear={true}
-        excludes={[form.pk]}
+        excludes={[form.pk!]}
         value={form.parentId}
         onChange={(value) => onChange('parentId', value)} />
 
@@ -357,48 +359,48 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Управление категориями</h1>
-          <p className="text-gray-600">Организуйте товары по категориям</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Управление категориями</h1>
+          <p className="text-sm sm:text-base text-gray-600">Организуйте товары по категориям</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-            <p className="text-purple-100 mb-1">Всего категорий</p>
-            <p className="text-4xl font-bold">{items.length}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 sm:p-6 text-white shadow-lg">
+            <p className="text-purple-100 mb-1 text-xs sm:text-sm">Всего категорий</p>
+            <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{items.length}</p>
           </div>
-          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-lg">
-            <p className="text-pink-100 mb-1">С описанием</p>
-            <p className="text-4xl font-bold">{items.filter(c => c.description).length}</p>
+          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-4 sm:p-6 text-white shadow-lg">
+            <p className="text-pink-100 mb-1 text-xs sm:text-sm">С описанием</p>
+            <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{items.filter(c => c.description).length}</p>
           </div>
-          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
-            <p className="text-indigo-100 mb-1">Без описания</p>
-            <p className="text-4xl font-bold">{items.filter(c => !c.description).length}</p>
+          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-4 sm:p-6 text-white shadow-lg">
+            <p className="text-indigo-100 mb-1 text-xs sm:text-sm">Без описания</p>
+            <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{items.filter(c => !c.description).length}</p>
           </div>
         </div>
 
         {/* Actions Bar */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row items-center gap-4">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 sm:gap-4">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder="Поиск категорий..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
               />
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
                   viewMode === 'grid' 
                     ? 'bg-purple-100 text-purple-600' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -408,7 +410,7 @@ export default function CategoriesPage() {
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
                   viewMode === 'table' 
                     ? 'bg-purple-100 text-purple-600' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -420,10 +422,12 @@ export default function CategoriesPage() {
 
             <Button
               variant="primary"
-              leftIcon={<Plus size={20} />}
+              leftIcon={<Plus size={18} className="sm:w-5 sm:h-5" />}
               onClick={openAdd}
+              className="w-full md:w-auto justify-center"
+              size="md"
             >
-              Добавить категорию
+              <span className="text-sm sm:text-base">Добавить категорию</span>
             </Button>
           </div>
         </div>
@@ -435,14 +439,14 @@ export default function CategoriesPage() {
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               {searchTerm ? 'Категории не найдены' : 'Нет категорий'}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-6">
               {searchTerm 
                 ? 'Попробуйте изменить поисковый запрос'
                 : 'Начните с добавления первой категории'
               }
             </p>
             {!searchTerm && (
-              <Button variant="primary" leftIcon={<Plus size={20} />} onClick={openAdd}>
+              <Button variant="primary" leftIcon={<Plus size={18} className="sm:w-5 sm:h-5" />} onClick={openAdd} size="md">
                 Добавить первую категорию
               </Button>
             )}
@@ -464,36 +468,44 @@ export default function CategoriesPage() {
               <table className="min-w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Название</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Slug</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Описание</th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Действия</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Название</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Slug</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">Описание</th>
+                    <th className="px-4 sm:px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Действия</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {items.map(category => (
                     <tr key={category.pk} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="font-semibold text-gray-900">{category.name}</div>
+                      <td className="px-4 sm:px-6 py-4">
+                        <div className="font-semibold text-gray-900 text-sm sm:text-base">{category.name}</div>
+                        <div className="text-xs text-gray-600 md:hidden mt-1">{category.description || <span className="text-gray-400">—</span>}</div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4">
+                        <span className="bg-purple-100 text-purple-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
+                          {/* {category.slug} */}
+                        </span>
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                         <span className="text-gray-700 text-sm">
                           {category.description || <span className="text-gray-400">—</span>}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
+                      <td className="px-4 sm:px-6 py-4">
+                        <div className="flex items-center justify-end gap-1 sm:gap-2">
                           <button
                             onClick={() => openEdit(category)}
-                            className="p-2 hover:bg-purple-100 rounded-lg text-purple-600 transition-colors"
+                            className="p-1.5 sm:p-2 hover:bg-purple-100 rounded-lg text-purple-600 transition-colors"
+                            aria-label="Редактировать"
                           >
-                            <Edit2 size={18} />
+                            <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                           </button>
                           <button
                             onClick={() => handleDelete(category.pk)}
-                            className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
+                            className="p-1.5 sm:p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
+                            aria-label="Удалить"
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                           </button>
                         </div>
                       </td>

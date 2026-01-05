@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Users, TrendingUp, Settings, Tag, Layers } from 'lucide-react';
+import { Users, TrendingUp, Settings } from 'lucide-react';
 import Sidebar from '../components/admin/Sidebar';
 import Header from '../components/admin/Header';
 // import DashboardContent from '../components/admin/DashboardContent';
@@ -71,10 +71,10 @@ const AdminPanel: React.FC = () => {
         onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
       
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-0">
         <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
         
-        <main className="p-6">
+        <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
           {renderContent()}
         </main>
       </div>

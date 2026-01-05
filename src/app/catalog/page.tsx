@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { CategoriesMenu } from '../components/CategoriesMenu/CategoriesMenu';
 import { FeaturedCategories } from '../components/FeaturedCategories/FeaturedCategories';
-import Header from '../components/Header';
+import Header from '../components/layout/Header';
 const App: React.FC = () => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
 

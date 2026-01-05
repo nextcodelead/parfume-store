@@ -36,10 +36,10 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
   const displayOldPrice = product.stocks?.[0]?.cost ?? 0;
 
   return (
-    <div className="relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-3 md:p-4 group focus-within:ring-2 focus-within:ring-rose-500 h-full flex flex-col">
+    <div className="relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow md:p-4 group focus-within:ring-2 focus-within:ring-rose-500 h-full flex flex-col">
       <Link
         href={`/products/${product.pk}`}
-        className="absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        className="absolute inset-0 z-10  rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label={`Перейти на страницу товара ${product.name}`}
       >
         <span className="sr-only">
@@ -75,8 +75,8 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
           />
         </div>
 
-        <div className="space-y-2 flex-1 flex flex-col">
-          <h3 className="text-sm md:text-lg font-semibold text-gray-900 min-h-[42px] flex items-start">
+        <div className="px-2 space-y-2 flex-1 flex flex-col">
+          <h3 className="text-sm md:text-lg font-semibold text-gray-900  flex items-start">
             {product.name}
           </h3>
 
@@ -99,7 +99,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
         </div>
         
         {!product.isInMyCart && (
-        <div className="pt-2">
+        <div className="px-2 py-2">
           <button 
             className={`relative z-40 w-full ${COLORS.primary} text-white py-2 text-sm md:text-base rounded-lg transition-colors`}
             type="button" onClick={async () => { await addToCart(product.pk, 1); onAddedToCart?.(); }}
