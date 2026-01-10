@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import { Mail, Phone, MapPin, Clock, Send, MessageSquare, User, CheckCircle } from 'lucide-react';
+import { Mail, Phone, Clock, Send, MessageSquare, User, CheckCircle, MessageCircle } from 'lucide-react';
 import Button from '../components/Button';
 
 const ContactsPage: React.FC = () => {
@@ -56,6 +56,14 @@ const ContactsPage: React.FC = () => {
     }
   ];
 
+  // Функция для перехода в Telegram
+  const handleTelegramClick = () => {
+    // Замените 'your_telegram_username' на реальный username или используйте bot ссылку
+    // Пример: https://t.me/your_telegram_username или https://t.me/your_bot_name?start=chat
+    const telegramUrl = 'https://t.me/your_telegram_username'; // TODO: Замените на реальную ссылку
+    window.open(telegramUrl, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -102,27 +110,69 @@ const ContactsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Социальные сети */}
-            {/* <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-lg p-8 text-white">
-              <h2 className="text-2xl font-bold mb-4">Мы в социальных сетях</h2>
-              <p className="text-rose-100 mb-6">
-                Следите за нашими новинками и акциями в социальных сетях
-              </p>
-              <div className="flex gap-4">
-                <a
-                  href="#"
-                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
+            {/* Telegram консультант виджет */}
+            <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-600 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
+              {/* Декоративные элементы */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0">
+                    <MessageCircle size={32} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-2">
+                      Чат с консультантом
+                    </h2>
+                    <p className="text-blue-100 text-sm sm:text-base">
+                      Получите мгновенную помощь от нашего специалиста в Telegram
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-2 text-blue-50">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-sm">Быстрые ответы на ваши вопросы</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-blue-50">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-sm">Консультация по выбору парфюмерии</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-blue-50">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <span className="text-sm">Помощь с оформлением заказа</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleTelegramClick}
+                  className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-3 group"
                 >
-                  Instagram
-                </a>
-                <a
-                  href="#"
-                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
-                >
-                  Facebook
-                </a>
+                  <svg 
+                    className="w-6 h-6 group-hover:scale-110 transition-transform" 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor"
+                  >
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                  </svg>
+                  <span className="text-lg">Открыть Telegram</span>
+                  <svg 
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                <p className="text-blue-100 text-xs text-center mt-4 opacity-75">
+                  Наш консультант обычно отвечает в течение 1-2 минут
+                </p>
               </div>
-            </div> */}
+            </div>
           </div>
 
           {/* Форма обратной связи */}

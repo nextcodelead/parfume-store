@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, Plus, Eye, Edit, Trash2, Download, ImportIcon, Upload, Settings } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, Plus, Eye, Edit, Trash2, Upload, Settings, Loader2 } from 'lucide-react';
 import { ProductFormData } from '../../types/product';
 import Button from '../Button';
 import AddProductModal from './AddProductModal';
@@ -9,6 +9,7 @@ import { useAdminProducts, useAdminProductsCount } from '@/app/hooks/useCategori
 import UploadImageModal from './UploadImageModal';
 import { useDeleteProduct } from '@/app/hooks/useProducts';
 import UpdateStockModal from './UpdateStockModal';
+import { importProducts } from '@/app/hooks/useImportProducts';
 
 const ProductsTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -18,6 +19,10 @@ const ProductsTable: React.FC = () => {
   const [isUpdateStockModalOpen, setIsUpdateStockModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [isUploadImageModalOpen, setIsUploadImageModalOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { data, loading, error, refetch } = useAdminProducts(searchTerm, currentPage);
   const { data: dataProductsCount, loading: loadingProductsCount, error: errorProductsCount } = useAdminProductsCount(searchTerm);
 
@@ -26,6 +31,51 @@ const ProductsTable: React.FC = () => {
   const handleAddProduct = (productData: ProductFormData) => {
     console.log('New product:', productData);
     refetch();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Проверка формата файла
+    const validExtensions = ['.xlsx', '.xls'];
+    const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+    
+    if (!validExtensions.includes(fileExtension)) {
+      setImportError('Пожалуйста, выберите файл Excel (.xlsx или .xls)');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    setIsImporting(true);
+    setImportError(null);
+    setImportSuccess(false);
+
+    try {
+      await importProducts(file);
+      setImportSuccess(true);
+      // Обновляем список товаров после успешного импорта
+      await refetch();
+      // Скрываем сообщение об успехе через 3 секунды
+      setTimeout(() => {
+        setImportSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Ошибка импорта:', err);
+      setImportError(err instanceof Error ? err.message : 'Не удалось импортировать файл. Проверьте формат данных.');
+    } finally {
+      setIsImporting(false);
+      // Очищаем input для возможности повторной загрузки того же файла
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -84,10 +134,35 @@ const ProductsTable: React.FC = () => {
             <option value="draft">Черновики</option>
             <option value="outofstock">Нет в наличии</option>
           </select>
-          <Button variant="outline" leftIcon={<ImportIcon size={18} className="sm:w-5 sm:h-5" />} className="text-sm sm:text-base">
-            <span className="hidden sm:inline">Импорт</span>
-            <span className="sm:hidden">Импорт</span>
-          </Button>
+          <div className="relative">
+            <Button 
+              variant="outline" 
+              leftIcon={isImporting ? <Loader2 size={18} className="sm:w-5 sm:h-5 animate-spin" /> : <Upload size={18} className="sm:w-5 sm:h-5" />} 
+              className="text-sm sm:text-base"
+              onClick={handleImportClick}
+              disabled={isImporting}
+            >
+              <span className="hidden sm:inline">{isImporting ? 'Импорт...' : 'Импорт'}</span>
+              <span className="sm:hidden">{isImporting ? '...' : 'Импорт'}</span>
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".xlsx,.xls"
+              className="hidden"
+              aria-label="Выбрать файл Excel для импорта"
+            />
+          </div>
+          {(importError || importSuccess) && (
+            <div className={`col-span-full px-4 py-2 rounded-lg text-sm ${
+              importSuccess 
+                ? 'bg-green-50 text-green-700 border border-green-200' 
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {importSuccess ? '✅ Товары успешно импортированы' : `❌ ${importError}`}
+            </div>
+          )}
         </div>
       </div>
 
