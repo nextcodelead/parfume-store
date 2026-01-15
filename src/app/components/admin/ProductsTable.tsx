@@ -124,7 +124,7 @@ const ProductsTable: React.FC = () => {
               className="pl-9 sm:pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm sm:text-base"
             />
           </div>
-          <select
+          {/* <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm sm:text-base"
@@ -133,7 +133,7 @@ const ProductsTable: React.FC = () => {
             <option value="active">Активные</option>
             <option value="draft">Черновики</option>
             <option value="outofstock">Нет в наличии</option>
-          </select>
+          </select> */}
           <div className="relative">
             <Button 
               variant="outline" 
