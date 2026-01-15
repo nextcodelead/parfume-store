@@ -52,7 +52,7 @@ const ProductsTable: React.FC = () => {
       }
       return;
     }
-
+    
     setIsImporting(true);
     setImportError(null);
     setImportSuccess(false);

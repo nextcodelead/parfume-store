@@ -6,6 +6,7 @@ import { ADD_BRAND, DELETE_BRAND, UPDATE_BRAND } from '../graphql/mutations';
 interface Brand {
   pk: number;
   name: string;
+  siteUrl?: string | null;
 }
 
 interface SelectBrandsData {

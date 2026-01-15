@@ -9,7 +9,7 @@ import { useAddBrand, useAdminBrands, useDeleteBrand, useUpdateBrand } from '@/a
 type Brand = {
   pk: number;
   name: string;
-  siteUrl: string | null;
+  siteUrl?: string | null;
 };
 // ============================================
 // BUTTON COMPONENT
@@ -292,7 +292,7 @@ export default function BrandsPage() {
     } else {
       const res = await addBrand({ variables: { input: { name: form.name, siteUrl: form.siteUrl || null } } })
       const newBrand: Brand = {
-        pk: res.data?.addBrand?.pk || Date.now(),
+        pk: (res.data as { addBrand?: { pk: number } } | undefined)?.addBrand?.pk || Date.now(),
         name: form.name,
         siteUrl: form.siteUrl || null,
       };
@@ -442,15 +442,15 @@ export default function BrandsPage() {
                           <div className="font-semibold text-gray-900">{brand.name}</div>
                         </td>
                         <td className="px-6 py-4">
-                          {brand.website ? (
+                          {brand.siteUrl ? (
                             <a
-                              href={brand.website}
+                              href={brand.siteUrl}
                               target="_blank"
                               rel="noreferrer"
                               className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
                             >
                               <Globe size={16} />
-                              <span className="truncate max-w-xs">{brand.website}</span>
+                              <span className="truncate max-w-xs">{brand.siteUrl}</span>
                             </a>
                           ) : (
                             <span className="text-gray-400">—</span>
@@ -466,7 +466,7 @@ export default function BrandsPage() {
                               <Edit2 size={18} />
                             </button>
                             <button
-                              onClick={() => handleDelete(brand.id)}
+                              onClick={() => handleDelete(brand.pk)}
                               className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
                               aria-label="Удалить"
                             >
@@ -484,23 +484,19 @@ export default function BrandsPage() {
             {/* Mobile Cards */}
             <div className="lg:hidden space-y-3 sm:space-y-4">
               {filteredItems.map(brand => (
-                <div key={brand.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                <div key={brand.pk} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-2 truncate">{brand.name}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Tag size={14} className="text-gray-400 flex-shrink-0" />
-                        <span className="bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm text-gray-700">{brand.slug}</span>
-                      </div>
-                      {brand.website && (
+                      {brand.siteUrl && (
                         <a
-                          href={brand.website}
+                          href={brand.siteUrl}
                           target="_blank"
                           rel="noreferrer"
                           className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 text-xs sm:text-sm"
                         >
                           <Globe size={14} className="flex-shrink-0" />
-                          <span className="truncate">{brand.website}</span>
+                          <span className="truncate">{brand.siteUrl}</span>
                         </a>
                       )}
                     </div>
@@ -515,7 +511,7 @@ export default function BrandsPage() {
                       <span>Редактировать</span>
                     </button>
                     <button
-                      onClick={() => handleDelete(brand.id)}
+                      onClick={() => handleDelete(brand.pk)}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
                     >
                       <Trash2 size={16} />

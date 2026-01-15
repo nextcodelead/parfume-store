@@ -10,8 +10,8 @@ import CategorySelect from '../CategoriesMenu/CategorySelect';
 type Category = {
   pk: number;
   name: string;
-  description: string | null;
-  parentId: number | null;
+  description?: string | null;
+  parentId?: number | null;
 };
 
 // ============================================
@@ -231,7 +231,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
 // ============================================
 
 interface CategoryFormProps {
-  form: { pk: number | null; name: string; description: string | null, parentId: number | null };
+  form: { pk: number | null; name: string; description?: string | null; parentId?: number | null };
   onChange: (field: string, value: string | number | null) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -259,7 +259,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ form, onChange, onSave, onC
       <CategorySelect
       canClear={true}
         excludes={[form.pk!]}
-        value={form.parentId}
+        value={form.parentId ?? null}
         onChange={(value) => onChange('parentId', value)} />
 
       <div className="flex gap-3 pt-4">
@@ -333,7 +333,7 @@ export default function CategoriesPage() {
     } else {
       const res = await addCategory({ variables: { input: { name: form.name, description: form.description, parentId: form.parentId } } });
       const newCategory: Category = {
-        pk: res.data.addCategory.pk,
+        pk: (res.data as { addCategory?: { pk: number } } | undefined)?.addCategory?.pk || Date.now(),
         name: form.name,
         description: form.description,
         parentId: form.parentId,

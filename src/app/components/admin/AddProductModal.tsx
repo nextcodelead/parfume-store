@@ -136,6 +136,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, productId, on
                 <CategorySelect
                   value={formData.categoryId}
                   onChange={(value) => setFormData({ ...formData, categoryId: value })}
+                  excludes={[]}
                 />
                 <BrandSelect
                   value={formData.brandId}

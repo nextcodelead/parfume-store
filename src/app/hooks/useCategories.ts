@@ -126,7 +126,7 @@ export const useBrands = () => {
 };
 export const useMainCategories = () => {
   const isClient = useIsClient();
-  return useQuery(MAIN_CATEGORIES, {
+  return useQuery<CategoriesResponse>(MAIN_CATEGORIES, {
     fetchPolicy: 'cache-first',
     errorPolicy: 'all',
     skip: !isClient,
@@ -154,7 +154,9 @@ export const useUpdateCategory = () => {
 export interface Category {
   pk: number;
   name: string;
-  iconUrl: string | null;
+  iconUrl?: string | null;
+  description?: string | null;
+  parentId?: number | null;
 }
 
 export interface Brand {
