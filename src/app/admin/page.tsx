@@ -14,6 +14,7 @@ const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
+  
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
