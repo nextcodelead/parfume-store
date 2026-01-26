@@ -70,7 +70,7 @@ export default function CartView() {
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">Корзина</h2>
           <p className="text-gray-600 mt-1">
-            {cart?.totalItems} товаров на сумму ${cart?.totalAmount?.toFixed(2)}
+            {cart?.totalItems} товаров на сумму ₽{cart?.totalAmount?.toFixed(2)}
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function CartView() {
                 <h3 className="text-lg font-semibold text-gray-900 truncate">
                   {item.product.name}
                 </h3>
-                <p className="text-gray-600">${item.product.price}</p>
+                <p className="text-gray-600">₽{item.product.price}</p>
                 <div className="flex items-center mt-2">
                   <span className={`px-2 py-1 text-xs rounded-full ${
                     item.product.inStock 
@@ -129,7 +129,7 @@ export default function CartView() {
 
                 <div className="text-right">
                   <p className="text-lg font-semibold text-gray-900">
-                    ${(item.product.price * item.quantity).toFixed(2)}
+                    ₽{(item.product.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
 
@@ -149,7 +149,7 @@ export default function CartView() {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-lg font-semibold text-gray-900">
-                Итого: ${cart?.totalAmount?.toFixed(2)}
+                Итого: ₽{cart?.totalAmount?.toFixed(2)}
               </p>
               <p className="text-sm text-gray-600">
                 {cart?.totalItems} товаров

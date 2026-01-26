@@ -93,7 +93,7 @@ export default function Orders() {
                     {getStatusText(order.status)}
                   </span>
                   <p className="text-xl font-bold text-gray-900 mt-2">
-                    ${order.totalAmount.toFixed(2)}
+                    ₽{order.totalAmount.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -120,12 +120,12 @@ export default function Orders() {
                         {item.product.name}
                       </h5>
                       <p className="text-sm text-gray-600">
-                        Количество: {item.quantity} × ${item.price.toFixed(2)}
+                        Количество: {item.quantity} × ₽{item.price.toFixed(2)}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-gray-900">
-                        ${(item.quantity * item.price).toFixed(2)}
+                        ₽{(item.quantity * item.price).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -160,13 +160,13 @@ export default function Orders() {
             <div>
               <h4 className="font-medium text-gray-900">Статистика заказов</h4>
               <p className="text-sm text-gray-600">
-                Общая сумма всех заказов: $
+                Общая сумма всех заказов: ₽
                 {orders.reduce((sum, order) => sum + order.totalAmount, 0).toFixed(2)}
               </p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">
-                Средний чек: $
+                Средний чек: ₽
                 {(orders.reduce((sum, order) => sum + order.totalAmount, 0) / orders.length).toFixed(2)}
               </p>
             </div>

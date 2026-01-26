@@ -112,9 +112,9 @@ export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQu
 
           {/* Price */}
           <div className="text-left sm:text-right flex-shrink-0">
-            <p className="text-base sm:text-lg font-bold text-gray-900">${subtotal.toFixed(2)}</p>
+            <p className="text-base sm:text-lg font-bold text-gray-900">₽{subtotal.toFixed(2)}</p>
             {selectedStock?.cost && (
-              <p className="text-xs text-gray-600">${selectedStock.cost.toFixed(2)} каждый</p>
+              <p className="text-xs text-gray-600">₽{selectedStock.cost.toFixed(2)} каждый</p>
             )}
           </div>
         </div>

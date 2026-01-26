@@ -61,7 +61,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
       <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-5 pb-4 sm:pb-5 border-b">
         <div className="flex justify-between text-sm sm:text-base text-gray-700">
           <span>Сумма ({items.length} {items.length === 1 ? 'товар' : items.length < 5 ? 'товара' : 'товаров'})</span>
-          <span className="font-semibold">${subtotal.toFixed(2)}</span>
+          <span className="font-semibold">₽{subtotal.toFixed(2)}</span>
         </div>
 
         {/* Shipping */}
@@ -87,7 +87,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
                     <p className="text-xs text-gray-600">{option.days}</p>
                   </div>
                 </div>
-                <span className="text-xs sm:text-sm font-semibold flex-shrink-0 ml-2">${option.price.toFixed(2)}</span>
+                <span className="text-xs sm:text-sm font-semibold flex-shrink-0 ml-2">₽{option.price.toFixed(2)}</span>
               </label>
             ))}
           </div>
@@ -95,20 +95,20 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
 
         <div className="flex justify-between text-sm sm:text-base text-gray-700">
           <span>Налог (10%)</span>
-          <span className="font-semibold">${tax.toFixed(2)}</span>
+          <span className="font-semibold">₽{tax.toFixed(2)}</span>
         </div>
 
         {discount > 0 && (
           <div className="flex justify-between text-sm sm:text-base text-green-600">
             <span>Скидка</span>
-            <span className="font-semibold">-${discount.toFixed(2)}</span>
+            <span className="font-semibold">-₽{discount.toFixed(2)}</span>
           </div>
         )}
       </div>
 
       <div className="flex justify-between items-center text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
         <span>Итого</span>
-        <span>${total.toFixed(2)}</span>
+        <span>₽{total.toFixed(2)}</span>
       </div>
 
       <Button 

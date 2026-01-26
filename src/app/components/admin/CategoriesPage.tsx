@@ -14,17 +14,13 @@ type Category = {
   parentId?: number | null;
 };
 
-// ============================================
-// BUTTON COMPONENT
-// ============================================
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'sm' | 'md';
   leftIcon?: React.ReactNode;
 }
-
+                 
 const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
@@ -55,10 +51,6 @@ const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
-
-// ============================================
-// INPUT COMPONENT
-// ============================================
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;

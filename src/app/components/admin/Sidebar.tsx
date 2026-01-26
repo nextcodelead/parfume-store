@@ -8,9 +8,10 @@ interface SidebarProps {
   onTabChange: (tab: string) => void;
   isMobileOpen: boolean;
   onMobileClose: () => void;
+  onLogout?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isMobileOpen, onMobileClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isMobileOpen, onMobileClose, onLogout }) => {
   return (
     <>
       {/* Mobile Overlay */}
@@ -85,7 +86,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isMobileOpen,
 
         {/* Logout */}
         <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-gray-800 bg-gray-900">
-          <button className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors text-sm sm:text-base">
+          <button 
+            onClick={onLogout}
+            className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors text-sm sm:text-base"
+          >
             <LogOut size={18} className="sm:w-5 sm:h-5" />
             <span>Выйти</span>
           </button>

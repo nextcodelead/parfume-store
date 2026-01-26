@@ -343,3 +343,38 @@ query mainCategories($filters: CategoryFilter){
   }
 }
 `;
+
+export const GET_WISHLIST = gql`
+  query getWishlist {
+    me {
+      wishlist {
+        pk
+        product {
+          pk
+          name
+          description
+          photo {
+            imageUrl
+          }
+          brand {
+            pk
+            name
+          }
+          category {
+            pk
+            name
+          }
+          stocks {
+            pk
+            cost
+            discount
+            quantity
+            size
+            unit
+            volume
+          }
+        }
+      }
+    }
+  }
+`;

@@ -36,7 +36,7 @@ const DeliveryMethodSelection: React.FC<DeliveryMethodProps> = ({ selected, onCh
                 <p className="text-sm text-gray-600">{method.time}</p>
               </div>
             </div>
-            <span className="font-bold text-gray-900">${method.price.toFixed(2)}</span>
+            <span className="font-bold text-gray-900">₽{method.price.toFixed(2)}</span>
           </label>
         ))}
       </div>

@@ -218,9 +218,9 @@ const ProductsTable: React.FC = () => {
                     }} aria-label="Настройки склада">
                       <Settings size={16} className="xl:w-[18px] xl:h-[18px]" />
                     </button>
-                    <button className="p-1.5 xl:p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors" aria-label="Просмотр">
+                    {/* <button className="p-1.5 xl:p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors" aria-label="Просмотр">
                       <Eye size={16} className="xl:w-[18px] xl:h-[18px]" />
-                    </button>
+                    </button> */}
                     <button className="p-1.5 xl:p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors" onClick={()=>{
                       setSelectedProductId(product.pk);
                       setIsAddModalOpen(true);

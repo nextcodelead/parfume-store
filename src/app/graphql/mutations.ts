@@ -219,3 +219,21 @@ export const UPDATE_CATEGORY = gql`
     }
   }
 `;
+
+export const ADD_TO_WISHLIST = gql`
+  mutation addToWishlist($productId: Int!) {
+    addToWishlist(productId: $productId) {
+      pk
+      product {
+        pk
+        name
+      }
+    }
+  }
+`;
+
+export const REMOVE_FROM_WISHLIST = gql`
+  mutation removeFromWishlist($pk: Int!) {
+    removeFromWishlist(pk: $pk)
+  }
+`;

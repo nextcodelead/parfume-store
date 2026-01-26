@@ -63,7 +63,7 @@ const ProductImageGallery: React.FC<Props> = ({ productId }) => {
       </div>
 
       {/* Thumbnails: horizontal scroll on mobile, grid on md+ */}
-      <div className="flex md:grid md:grid-cols-4 gap-2 overflow-x-auto md:overflow-visible py-1 -mx-1 px-1">
+      <div className="flex gap-2 overflow-x-auto md:overflow-visible py-1 -mx-1 px-1 p-4">
         {images.map((img, idx) => (
           <button
             key={idx}
@@ -73,7 +73,7 @@ const ProductImageGallery: React.FC<Props> = ({ productId }) => {
             }`}
             aria-label={`Show image ${idx + 1}`}
           >
-            <Image 
+            <Image
               src={`https://dataset.uz/${images[idx]}`} 
               alt={`Product Image ${idx + 1}`} 
               width={150}
