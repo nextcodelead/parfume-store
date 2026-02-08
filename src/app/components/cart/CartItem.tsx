@@ -15,10 +15,23 @@ type CartItemProps = {
 export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQuantity, onRemove }) => {
 
   // const subtotal = item.price * item.quantity;
-  const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const [selectedStock, setSelectedStock] = useState<Stock | null>(cart.stock ?? null);
+  const [quantity, setQuantity] = useState(cart.count);
   const [haveInStock, setHaveInStock] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
+
+  // Инициализируем selectedStock из cart.stock при загрузке
+  useEffect(() => {
+    if (cart.stock) {
+      setSelectedStock(cart.stock);
+    }
+  }, [cart.stock?.pk]); // Используем pk для отслеживания изменений
+
+  // Синхронизируем quantity с cart.count
+  useEffect(() => {
+    setQuantity(cart.count);
+  }, [cart.count]);
+
   useEffect(() => {
     setHaveInStock(
       cart.product.stocksCount > 0 &&
@@ -28,7 +41,9 @@ export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQu
 
   useEffect(() => {
     if (selectedStock) {
-      setSubtotal(selectedStock.cost * quantity);
+      // Используем discount если есть, иначе cost
+      const price = selectedStock.discount ?? selectedStock.cost;
+      setSubtotal(price * quantity);
     } else {
       setSubtotal(0);
     }
@@ -113,8 +128,13 @@ export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQu
           {/* Price */}
           <div className="text-left sm:text-right flex-shrink-0">
             <p className="text-base sm:text-lg font-bold text-gray-900">₽{subtotal.toFixed(2)}</p>
-            {selectedStock?.cost && (
-              <p className="text-xs text-gray-600">₽{selectedStock.cost.toFixed(2)} каждый</p>
+            {selectedStock && (
+              <p className="text-xs text-gray-600">
+                ₽{(selectedStock.discount ?? selectedStock.cost).toFixed(2)} каждый
+                {selectedStock.discount && selectedStock.cost && selectedStock.discount < selectedStock.cost && (
+                  <span className="text-gray-400 line-through ml-1">₽{selectedStock.cost.toFixed(2)}</span>
+                )}
+              </p>
             )}
           </div>
         </div>

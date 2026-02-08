@@ -64,7 +64,7 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
       quantity: quantity,
       price: selectedSize?.discount ?? selectedSize?.cost ?? 0
     });
-    await addToCart(productData.product.pk, 1);
+    await addToCart(productData.product.pk, quantity);
     // reload page
     window.location.reload();
   };
@@ -121,14 +121,25 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
 
           {/* Price & Stock */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-            <div className="flex items-baseline gap-2 sm:gap-3 flex-wrap">
-              <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">₽{selectedSize?.discount ?? 0}</span>
-              {selectedSize?.cost ? (
-                <>
-                  <span className="text-base sm:text-lg md:text-xl text-gray-500 line-through">₽{selectedSize?.cost}</span>
-                  <span className="bg-red-100 text-red-600 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-semibold text-xs sm:text-sm">{`-${discount}%`}</span>
-                </>
-              ) : null}
+            <div className="flex flex-col gap-1 sm:gap-2">
+              <div className="flex items-baseline gap-2 sm:gap-3 flex-wrap">
+                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
+                  ₽{((selectedSize?.discount ?? selectedSize?.cost ?? 0) * quantity).toFixed(2)}
+                </span>
+                {selectedSize?.cost && selectedSize?.discount && selectedSize.discount < selectedSize.cost ? (
+                  <>
+                    <span className="text-base sm:text-lg md:text-xl text-gray-500 line-through">
+                      ₽{(selectedSize.cost * quantity).toFixed(2)}
+                    </span>
+                    <span className="bg-red-100 text-red-600 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-semibold text-xs sm:text-sm">{`-${discount}%`}</span>
+                  </>
+                ) : null}
+              </div>
+              {quantity > 1 && (
+                <p className="text-xs sm:text-sm text-gray-500">
+                  ₽{(selectedSize?.discount ?? selectedSize?.cost ?? 0).toFixed(2)} × {quantity} шт.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
@@ -180,12 +191,15 @@ const ProductInfo: React.FC<Props> = ({ productId }) => {
                         : 'border-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold text-sm sm:text-base">{stock.size} {stock.unit}</div>
-                        <div className="text-xs text-gray-500 mt-0.5 sm:mt-1">Кол-во: {stock.quantity}</div>
+                    <div className="w-full">
+                      <div className="font-semibold text-sm sm:text-base mb-1.5">{stock.size} {stock.unit}</div>
+                      <div className={`text-xs rounded px-1.5 py-0.5 inline-block ${
+                        stock.quantity > 0 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-red-100 text-red-600'
+                      }`}>
+                        {stock.quantity > 0 ? `В наличии: ${stock.quantity} шт.` : 'Нет в наличии'}
                       </div>
-                      {stock.quantity === 0 && <div className="text-xs text-red-500">Нет</div>}
                     </div>
                   </button>
                 ))}

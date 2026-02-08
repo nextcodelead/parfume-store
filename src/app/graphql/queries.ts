@@ -305,6 +305,8 @@ export const ORDER_CARTS = gql`
         }
         size
         unit
+        discount
+        cost
       }
       cost
       count

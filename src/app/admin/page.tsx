@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, TrendingUp, Settings } from 'lucide-react';
 import Sidebar from '../components/admin/Sidebar';
-import Header from '../components/admin/Header';
+// import Header from '../components/admin/Header';
 import AdminLogin from '../components/admin/AdminLogin';
 // import DashboardContent from '../components/admin/DashboardContent';
 import ProductsTable from '../components/admin/ProductsTable';
@@ -131,7 +131,7 @@ const AdminPanel: React.FC = () => {
       />
       
       <div className="flex-1 flex flex-col min-w-0 lg:ml-0">
-        <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
+        {/* <Header onMenuClick={() => setIsMobileSidebarOpen(true)} /> */}
         
         <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
           {renderContent()}

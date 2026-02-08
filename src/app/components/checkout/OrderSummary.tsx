@@ -8,14 +8,18 @@ interface OrderSummaryProps {
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({ deliveryPrice }) => {
   const { data: orderCartsData, loading: orderCartsLoading, error: orderCartsError } = useOrderCarts();
-  const subtotal = orderCartsData?.orderCarts.reduce((sum, item) => sum + item.cost * item.count, 0) || 0;
+  // Используем discount если есть, иначе cost
+  const subtotal = orderCartsData?.orderCarts.reduce((sum, item) => {
+    const price = item.stock.discount ?? item.stock.cost ?? item.cost;
+    return sum + price * item.count;
+  }, 0) || 0;
   const tax = subtotal * 0.1;
   const total = subtotal + deliveryPrice + tax;
   if (orderCartsLoading) {
-    return <div>Loading order summary...</div>;
+    return <div className="text-center text-gray-600 py-4">Загрузка сводки заказа...</div>;
   }
   if (orderCartsError) {
-    return <div>Error loading order summary</div>;
+    return <div className="text-center text-red-600 py-4">Ошибка загрузки сводки заказа</div>;
   }
   return (
     <div className="bg-white rounded-xl p-6 shadow-md sticky top-4">
@@ -30,7 +34,9 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ deliveryPrice }) => {
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900 text-sm">{item.stock.product.name}</h3>
               <p className="text-xs text-gray-600">{item.stock.size}{item.stock.unit} × {item.count}</p>
-              <p className="font-bold text-gray-900 text-sm">{(item.cost * item.count).toFixed(2)} ₽</p>
+              <p className="font-bold text-gray-900 text-sm">
+                {((item.stock.discount ?? item.stock.cost ?? item.cost) * item.count).toFixed(2)} ₽
+              </p>
             </div>
           </div>
         ))}

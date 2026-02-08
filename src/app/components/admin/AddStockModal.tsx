@@ -48,6 +48,7 @@ const AddStockModal: React.FC<AddStockModalProps> = ({
   onSubmit,
 }) => {
   const [formData, setFormData] = useState<StockFormData>({ ...INITIAL_FORM, productId });
+  const [noDiscount, setNoDiscount] = useState(false);
   const { data, error: stockError } = useStock(stockId);
   const stockDetails = (data as StockResponse | undefined)?.stock;
 
@@ -57,19 +58,25 @@ const AddStockModal: React.FC<AddStockModalProps> = ({
 
   useEffect(() => {
     if (stockDetails) {
+      const cost = stockDetails.cost ?? 0;
+      const discount = stockDetails.discount ?? 0;
+      const isNoDiscount = cost === discount || discount === 0;
+      
       setFormData({
         productId,
         article: stockDetails.article ?? '',
-        cost: stockDetails.cost ?? 0,
-        discount: stockDetails.discount ?? 0,
+        cost,
+        discount: isNoDiscount ? cost : discount,
         quantity: stockDetails.quantity ?? 0,
         volume: stockDetails.volume ?? 0,
         weight: stockDetails.weight ?? 0,
         size: stockDetails.size,
         unit: stockDetails.unit,
       });
+      setNoDiscount(isNoDiscount);
     } else {
       setFormData({ ...INITIAL_FORM, productId });
+      setNoDiscount(true);
     }
   }, [stockDetails, productId]);
 
@@ -79,19 +86,24 @@ const AddStockModal: React.FC<AddStockModalProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
+      // Если "Без акции" включен, убеждаемся что discount = cost
+      const finalFormData = noDiscount 
+        ? { ...formData, discount: formData.cost }
+        : formData;
+
       if (stockId == null) {
-        const result = await addStock({ variables: { input: formData } });
+        const result = await addStock({ variables: { input: finalFormData } });
         const addedStock = (result.data as { addStock: { pk: number } } | undefined)?.addStock;
         console.log('✅ Добавлено:', addedStock);
       } else {
         await updateStock({
           variables: {
             pk: stockId,
-            input: formData,
+            input: finalFormData,
           },
         });
       }
-      onSubmit(formData);
+      onSubmit(finalFormData);
       onClose();
     } catch (err) {
       console.error('❌ Ошибка добавления:', err);
@@ -176,31 +188,72 @@ const AddStockModal: React.FC<AddStockModalProps> = ({
               Стоимость и остатки
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-700">
-                  <Gauge size={14} />
-                  Текущая цена
-                </div>
-                <Input
-                  label="Цена со скидкой"
-                  type="number"
-                  required
-                  value={String(formData.discount ?? 0)}
-                  onChange={(e) => setFormData({ ...formData, discount: Number(e.target.value) })}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <input
+                  type="checkbox"
+                  id="noDiscount"
+                  checked={noDiscount}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setNoDiscount(checked);
+                    if (checked) {
+                      // Если "Без акции" включен, устанавливаем discount = cost
+                      setFormData({ ...formData, discount: formData.cost });
+                    }
+                  }}
+                  className="w-4 h-4 text-rose-600 border-gray-300 rounded focus:ring-rose-500"
                 />
+                <label htmlFor="noDiscount" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Товар без акции (цена со скидкой = базовой цене)
+                </label>
               </div>
-              <div className="rounded-xl border border-rose-100 bg-rose-50/60 p-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-rose-700">
-                  <Beaker size={14} />
-                  Базовая цена
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="rounded-xl border border-rose-100 bg-rose-50/60 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-rose-700">
+                    <Beaker size={14} />
+                    Базовая цена
+                  </div>
+                  <Input
+                    label="Цена без акции"
+                    type="number"
+                    required
+                    value={String(formData.cost ?? 0)}
+                    onChange={(e) => {
+                      const newCost = Number(e.target.value);
+                      setFormData({ 
+                        ...formData, 
+                        cost: newCost,
+                        // Если "Без акции" включен, синхронизируем discount с cost
+                        discount: noDiscount ? newCost : formData.discount
+                      });
+                    }}
+                  />
                 </div>
-                <Input
-                  label="Старая цена"
-                  type="number"
-                  value={String(formData.cost ?? 0)}
-                  onChange={(e) => setFormData({ ...formData, cost: Number(e.target.value) })}
-                />
+                <div className={`rounded-xl border p-4 space-y-2 ${noDiscount ? 'border-gray-200 bg-gray-50/60' : 'border-emerald-100 bg-emerald-50/60'}`}>
+                  <div className={`flex items-center gap-2 text-xs uppercase tracking-widest ${noDiscount ? 'text-gray-500' : 'text-emerald-700'}`}>
+                    <Gauge size={14} />
+                    Цена со скидкой
+                  </div>
+                  <Input
+                    label="Цена со скидкой"
+                    type="number"
+                    required
+                    disabled={noDiscount}
+                    value={String(formData.discount ?? 0)}
+                    onChange={(e) => {
+                      if (!noDiscount) {
+                        setFormData({ ...formData, discount: Number(e.target.value) });
+                      }
+                    }}
+                  />
+                  {noDiscount && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Автоматически равна базовой цене
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

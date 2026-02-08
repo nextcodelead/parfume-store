@@ -41,6 +41,8 @@ interface OrderCartItem {
   stock: {
     size: string;
     unit: string;
+    discount: number;
+    cost: number;
     product: {
       name: string;
       brand: { name: string };

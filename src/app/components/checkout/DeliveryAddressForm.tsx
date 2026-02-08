@@ -21,56 +21,56 @@ const DeliveryAddressForm: React.FC<DeliveryAddressFormProps> = ({ formData, err
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Country"
+            label="Страна"
             required
             value={formData.country}
             onChange={(e) => onChange('country', e.target.value)}
             error={errors.country}
-            placeholder="United States"
+            placeholder="Россия"
           />
           <Input
-            label="City"
+            label="Город"
             required
             value={formData.city}
             onChange={(e) => onChange('city', e.target.value)}
             error={errors.city}
-            placeholder="New York"
+            placeholder="Москва"
           />
         </div>
 
         <Input
-          label="Street Address"
+          label="Адрес"
           required
           value={formData.address}
           onChange={(e) => onChange('address', e.target.value)}
           error={errors.address}
-          placeholder="123 Main Street"
+          placeholder="ул. Ленина, д. 10"
         />
 
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Apartment / Suite"
+            label="Квартира / Офис"
             value={formData.apartment}
             onChange={(e) => onChange('apartment', e.target.value)}
-            placeholder="Apt 4B (optional)"
+            placeholder="Кв. 15 (необязательно)"
           />
           <Input
-            label="Zip / Postal Code"
+            label="Почтовый индекс"
             required
             value={formData.zipCode}
             onChange={(e) => onChange('zipCode', e.target.value)}
             error={errors.zipCode}
-            placeholder="10001"
+            placeholder="101000"
           />
         </div>
 
         <Textarea
-          label="Delivery Notes"
+          label="Примечания к доставке"
           value={formData.deliveryNote}
           onChange={(e) => onChange('deliveryNote', e.target.value)}
-          placeholder="Any special instructions for delivery..."
+          placeholder="Любые особые указания для доставки..."
           rows={3}
-          hint="Optional: Leave at door, call on arrival, etc."
+          hint="Необязательно: Оставить у двери, позвонить по прибытии и т.д."
         />
 
         <label className="flex items-center gap-2 cursor-pointer">

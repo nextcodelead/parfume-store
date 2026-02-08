@@ -47,7 +47,7 @@ const App: React.FC = () => {
           ) : newError ? (
             <div>Error loading products</div>
           ) : newArrivals.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {newArrivals.map((product: Product) => (
                 <ProductCard 
                   key={`new-${product.pk}`}
@@ -73,7 +73,7 @@ const App: React.FC = () => {
           ) : error ? (
             <div>Error loading products</div>
           ) : promoProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {promoProducts.map((product: Product) => (
                 <ProductCard
                   key={`promo-${product.pk}`}
@@ -96,7 +96,7 @@ const App: React.FC = () => {
           ) : error ? (
             <div>Error loading products</div>
           ) : allProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {allProducts.map((product: Product) => (
                 <ProductCard 
                   key={product.pk}

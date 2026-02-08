@@ -40,8 +40,8 @@ interface WishlistResponse {
 
 export const useWishlist = () => {
   const isClient = useIsClient();
-  
-  const { data, loading, error, refetch } = useQuery<WishlistResponse>(GET_WISHLIST, {
+   
+    const { data, loading, error, refetch } = useQuery<WishlistResponse>(GET_WISHLIST, {
     fetchPolicy: 'cache-and-network',
     errorPolicy: 'all',
     skip: !isClient,

@@ -143,7 +143,7 @@ const CheckoutPage: React.FC = () => {
             </button>
             <div className="flex items-center gap-2">
               <span className="text-3xl">🌸</span>
-              <h1 className="text-xl font-bold">Checkout</h1>
+              <h1 className="text-xl font-bold">Оформление заказа</h1>
             </div>
           </div>
         </div>
@@ -200,7 +200,7 @@ const CheckoutPage: React.FC = () => {
                   onClick={handleBack}
                   leftIcon={<ChevronLeft size={20} />}
                 >
-                  Back
+                  Назад
                 </Button>
               )}
               
@@ -211,7 +211,7 @@ const CheckoutPage: React.FC = () => {
                   fullWidth={currentStep === 0}
                   onClick={handleNext}
                 >
-                  Continue
+                  Продолжить
                 </Button>
               ) : (
                 <Button
@@ -222,7 +222,7 @@ const CheckoutPage: React.FC = () => {
                   isLoading={isSubmitting}
                   leftIcon={<Lock size={20} />}
                 >
-                  Place Order
+                  Оформить заказ
                 </Button>
               )}
             </div>
@@ -233,7 +233,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
       </main>
-
+{/* 
       <footer className="bg-white border-t mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-sm text-gray-600 mb-2">
@@ -243,7 +243,7 @@ const CheckoutPage: React.FC = () => {
             © 2025 Essence Luxe. All rights reserved.
           </p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 };

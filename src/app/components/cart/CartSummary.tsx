@@ -19,7 +19,11 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   const [beginBuy, {loading}] = useBeginBuy();
   
 
-  const subtotal = items.reduce((sum, item) => sum + (item.stock?.cost ?? 0) * item.count, 0);
+  // Используем discount если есть, иначе cost
+  const subtotal = items.reduce((sum, item) => {
+    const price = item.stock ? (item.stock.discount ?? item.stock.cost) : 0;
+    return sum + price * item.count;
+  }, 0);
   const shipping = SHIPPING_OPTIONS.find((s) => s.id === selectedShipping)?.price || 0;
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax - discount;
