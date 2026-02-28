@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@apollo/client/react';
-import { GET_USER_CART } from '../graphql/queries';
+import { GET_USER_CART, ME_MAIN, ME_USER_CART } from '../graphql/queries';
 import { ADD_PRODUCT_TO_USER_CART, REMOVE_ALL_PRODUCTS_FROM_USER_CART, REMOVE_PRODUCT_FROM_USER_CART } from '../graphql/mutations';
 import { useIsClient } from './useIsClient';
 
@@ -76,7 +76,7 @@ export const useRemoveProductFromCart = () => {
 // Хук для добавления продукта в корзину
 export const useAddToCart = () => {
   const [addToCartMutation, { loading, error }] = useMutation<AddToCartResponse>(ADD_PRODUCT_TO_USER_CART, {
-    refetchQueries: [GET_USER_CART],
+    refetchQueries: [ME_USER_CART, ME_MAIN],
     fetchPolicy: 'network-only',
     errorPolicy: 'all',
   });

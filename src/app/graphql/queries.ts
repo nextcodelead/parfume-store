@@ -293,8 +293,11 @@ export const STOCKS = gql`
 export const ORDER_CARTS = gql`
   query {
     orderCarts {
+      pk
       stock {
+        pk
         product {
+          pk
           photo {
             imageUrl
           }

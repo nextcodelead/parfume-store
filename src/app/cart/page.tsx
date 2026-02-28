@@ -10,6 +10,7 @@ import Button from "../components/Button";
 import { Trash2, ChevronRight } from "lucide-react";
 import { useRemoveAllFromCart, useRemoveProductFromCart } from "../hooks/useUserCart";
 import { useMeUserCart } from "../hooks/useMe";
+import { useCartRecovery } from "../hooks/useCartRecovery";
 import { Stock, UserCartEntry } from "../types/graphql";
 
 // Создаем совместимый тип для данных с бекенда
@@ -32,7 +33,8 @@ export default function CartPage() {
   const { loading, data, error, refetch } = useMeUserCart();
   const router = useRouter();
   const [carts, setCarts] = useState<UserCartEntry[]>([]);
-
+  const { restoreCartFromBackup } = useCartRecovery();
+  
   // Преобразуем данные при получении
   useEffect(() => {
     if (data?.me?.userCart) {
@@ -50,21 +52,24 @@ export default function CartPage() {
       setCarts(transformedCarts);
     }
   }, [data?.me?.userCart]);
-
-  // Список для рендера: избегаем показа "пусто" до применения данных
-  const rawCart = data?.me?.userCart as unknown as BackendCartItem[] | undefined;
-  const rawArray = Array.isArray(rawCart) ? rawCart : [];
-  const cartList = rawArray.length > 0 && carts.length === 0
-    ? rawArray.map(item => ({
-        ...item,
-        product: {
-          ...item.product,
-          brand: item.product?.brand ?? { name: "" },
-          photo: item.product?.photo ?? null,
-          stocksCount: item.product?.stocksCount ?? 0
-        }
-      })) as UserCartEntry[]
-    : carts;
+  
+  // При первой загрузке страницы только рефетчим - восстановление будет если корзина пуста
+  useEffect(() => {
+    refetch();
+  }, []);
+  
+  // Восстанавливаем корзину только если она пуста на сервере
+  useEffect(() => {
+    if (!loading && carts.length === 0) {
+      restoreCartFromBackup(0);
+    } else if (carts.length > 0) {
+      // Если корзина имеет товары, очищаем флаги восстановления
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('isReturningFromCheckout');
+        sessionStorage.removeItem('cartBackup');
+      }
+    }
+  }, [loading, carts.length]);
 
   if (loading) {
     return (
@@ -88,7 +93,7 @@ export default function CartPage() {
     );
   }
   
-  if (cartList.length === 0) {
+  if (carts.length === 0) {
     return (
       <>
         <Header />
@@ -119,7 +124,7 @@ export default function CartPage() {
             <div className="lg:col-span-2 space-y-3 sm:space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-                  Корзина <span className="text-gray-600 font-normal">({cartList.length} {cartList.length === 1 ? 'товар' : cartList.length < 5 ? 'товара' : 'товаров'})</span>
+                  Корзина <span className="text-gray-600 font-normal">({carts.length} {carts.length === 1 ? 'товар' : carts.length < 5 ? 'товара' : 'товаров'})</span>
                 </h1>
                 <button
                   onClick={async () => { await removeAllFromCart(); await refetch(); }}
@@ -130,7 +135,7 @@ export default function CartPage() {
                 </button>
               </div>
 
-              {cartList.map((item) => (
+              {carts.map((item) => (
                 <CartItem
                   key={item.pk}
                   cart={item}
@@ -173,7 +178,7 @@ export default function CartPage() {
 
             {/* Итог корзины */}
             <div className="lg:col-span-1">
-              <CartSummary items={cartList} />
+              <CartSummary items={carts} />
             </div>
           </div>
         </div>

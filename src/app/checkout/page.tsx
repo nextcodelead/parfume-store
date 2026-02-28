@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { FormData, FormErrors } from '../types/checkoutTypes';
 import { STEPS, DELIVERY_METHODS } from '../data/checkoutData';
@@ -16,6 +16,19 @@ import Button from '../components/Button';
 import { useCreateOrder } from '../hooks/useBuy';
 
 const CheckoutPage: React.FC = () => {
+  // Сохраняем исходную корзину при входе на страницу оформления
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Сохраняем флаг, что пользователь в процессе оформления
+      sessionStorage.setItem('isCheckingOut', 'true');
+    }
+    return () => {
+      // Очищаем флаг при выходе со страницы
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('isCheckingOut');
+      }
+    };
+  }, []);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -112,6 +125,14 @@ const CheckoutPage: React.FC = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+  
+  const handleNavigateBack = () => {
+    // Если пользователь полностью выходит из оформления, уведомляем что нужно восстановление
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('isReturningFromCheckout', 'true');
+    }
+    window.history.back();
+  };
 
   const handleSubmit = async () => {
     const validationErrors = validateForm(formData, currentStep);
@@ -138,7 +159,7 @@ const CheckoutPage: React.FC = () => {
       <header className="bg-white shadow-sm py-4 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-4">
-            <button onClick={() => window.history.back()} className="p-2 hover:bg-gray-100 rounded-full">
+            <button onClick={handleNavigateBack} className="p-2 hover:bg-gray-100 rounded-full">
               <ChevronLeft size={24} />
             </button>
             <div className="flex items-center gap-2">

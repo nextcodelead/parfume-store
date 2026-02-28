@@ -30,33 +30,80 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
   const router = useRouter();
 
   const beginProcessBuy = async () => {
-    // Явно типизируем payload для мутации
     const products: { stockId?: number | null; count: number }[] = items.map((item) => ({
       stockId: item.stock?.pk ?? null,
       count: item.count,
     }));
 
+    const itemsWithoutStock = items.filter((item) => !item.stock?.pk);
+    if (itemsWithoutStock.length > 0) {
+      alert(
+        'Для всех товаров нужно выбрать объём. Выберите вариант в каждом товаре (например 50 ml, 100 ml).'
+      );
+      return;
+    }
+
     try {
-      const res = await beginBuy({ variables: { products } });
-      const payload = res.data?.beginBuy;
-      if (payload) {
-        // Если сервер вернул redirectUrl — можно перенаправить туда
-        if (payload.redirectUrl) {
-          router.push(payload.redirectUrl);
-        } else {
-          // fallback: перейти на checkout
-          router.push("/checkout");
-        }
-      } else {
-        // обработка ошибки / неуспешного результата
-        console.warn('Begin buy failed or returned no success flag', payload);
-        alert('Не удалось начать оформление. Попробуйте ещё раз.');
+      // Сохраняем товары в sessionStorage перед оформлением на случай возврата
+      // Удаляем дубли по комбинации product.pk + stock.pk
+      if (typeof window !== 'undefined') {
+        const deduplicatedItems = items.reduce((unique: typeof items, item) => {
+          const isDuplicate = unique.some(
+            u => u.product?.pk === item.product?.pk && u.stock?.pk === item.stock?.pk
+          );
+          if (!isDuplicate) {
+            unique.push(item);
+          }
+          return unique;
+        }, []);
+        
+        console.log(`Сохраняю резервную копию: ${items.length} товаров, после дедупликации: ${deduplicatedItems.length}`);
+        sessionStorage.setItem('cartBackup', JSON.stringify(deduplicatedItems));
       }
+
+      const res = await beginBuy({ variables: { products } });
+      const raw = res.data?.beginBuy;
+      const gqlErrors = 'errors' in res ? (res as { errors?: { message?: string }[] }).errors : undefined;
+
+      if (gqlErrors?.length) {
+        const msg = gqlErrors[0]?.message ?? 'Ошибка сервера';
+        alert(msg);
+        return;
+      }
+
+      if (raw != null && raw !== false) {
+        if (typeof raw === 'string') {
+          // Очищаем флаги при успешном переходе на оплату
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('cartBackup');
+          }
+          router.push(raw);
+          return;
+        }
+        const payload = raw as { success?: boolean; redirectUrl?: string; orderId?: number };
+        if (payload?.redirectUrl) {
+          // Очищаем флаги при успешном переходе на оплату
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('cartBackup');
+          }
+          router.push(payload.redirectUrl);
+          return;
+        }
+      }
+
+      // Очищаем флаги при переходе в оформление
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('cartBackup');
+      }
+      router.push("/checkout");
     } catch (err) {
       console.error('Begin buy error:', err);
-      alert('Ошибка при попытке оформить заказ.');
+      const message = err instanceof Error ? err.message : 'Ошибка при попытке оформить заказ.';
+      alert(message);
     }
-  }
+  };
+
+  const allHaveStockSelected = items.every((item) => item.stock?.pk != null);
 
   return (
     <div className="bg-white rounded-lg p-4 sm:p-5 lg:p-6 shadow-md lg:sticky lg:top-24">
@@ -115,16 +162,21 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ items }) => {
         <span>₽{total.toFixed(2)}</span>
       </div>
 
+      {!allHaveStockSelected && items.some((i) => i.product.stocksCount > 0) && (
+        <p className="text-amber-700 text-sm mb-3">
+          Выберите объём для каждого товара (в блоке товара выше), затем нажмите кнопку ниже.
+        </p>
+      )}
       <Button 
         variant="primary" 
         size="lg" 
         fullWidth 
         rightIcon={<ArrowRight size={18} className="sm:w-5 sm:h-5" />}
         onClick={beginProcessBuy}
-        disabled={loading}
+        disabled={loading || !allHaveStockSelected}
         className="w-full"
       >
-        {loading ? 'Обработка...' : 'Перейти к оформлению заказа'}
+        {loading ? 'Обработка...' : allHaveStockSelected ? 'Перейти к оформлению заказа' : 'Выберите объём для всех товаров'}
       </Button>
 
       <div className="mt-4 sm:mt-6 space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-600">

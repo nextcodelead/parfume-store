@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react';
 import { Product } from '../types/graphql';
 import { useAddToCart } from '../hooks/useUserCart';
 import { useWishlist } from '../hooks/useWishlist';
+import { useCartStateOptional } from '../context/CartStateContext';
 
 type ProductWithStocks = Product & {
   stocks?: {
@@ -29,10 +30,17 @@ const SITE_CONFIG = {
 };
 
 const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedToCart }) => {
-  const { addToCart, loading: addingToCart } = useAddToCart();
+  const cartState = useCartStateOptional();
+  const { addToCart, loading: addingToCartLegacy } = useAddToCart();
   const { isInWishlist, addProduct, removeProductById } = useWishlist();
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const isInCart = cartState
+    ? cartState.productIdsInCart.includes(product.pk)
+    : !!product.isInMyCart;
+  const isAdding = cartState ? cartState.addingProductId === product.pk : addingToCartLegacy;
+  const addToCartFn = cartState ? cartState.addToCart : addToCart;
 
   useEffect(() => {
     setIsFavorite(isInWishlist(product.pk));
@@ -62,7 +70,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    await addToCart(product.pk, 1);
+    await addToCartFn(product.pk, 1);
     onAddedToCart?.();
   };
 
@@ -87,7 +95,7 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
         <button 
           onClick={handleToggleFavorite}
           disabled={isLoading}
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-40 disabled:opacity-50"
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 disabled:opacity-50"
           aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
           type="button"
         >
@@ -129,14 +137,15 @@ const ProductCard: React.FC<Props> = ({ product, showDiscount = false, onAddedTo
           </div>
         </div>
         
-        {!product.isInMyCart && (
+        {!isInCart && (
         <div className="px-2 py-2">
           <button 
-            className={`relative z-40 w-full ${COLORS.primary} text-white py-2 text-sm md:text-base rounded-lg transition-colors`}
+            className={`relative z-10 w-full ${COLORS.primary} text-white py-2 text-sm md:text-base rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed`}
             type="button" 
             onClick={handleAddToCart}
+            disabled={isAdding}
           >
-            Добавить в корзину
+            {isAdding ? 'Добавление...' : 'Добавить в корзину'}
           </button>
         </div>
         )}

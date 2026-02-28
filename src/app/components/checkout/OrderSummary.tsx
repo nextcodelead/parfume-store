@@ -10,8 +10,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ deliveryPrice }) => {
   const { data: orderCartsData, loading: orderCartsLoading, error: orderCartsError } = useOrderCarts();
   // Используем discount если есть, иначе cost
   const subtotal = orderCartsData?.orderCarts.reduce((sum, item) => {
-    const price = item.stock.discount ?? item.stock.cost ?? item.cost;
-    return sum + price * item.count;
+    const price = item.stock?.discount ?? item.stock?.cost ?? item.cost ?? 0;
+    return sum + price * (item.count ?? 0);
   }, 0) || 0;
   const tax = subtotal * 0.1;
   const total = subtotal + deliveryPrice + tax;
@@ -26,20 +26,30 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ deliveryPrice }) => {
       <h2 className="text-xl font-bold text-gray-900 mb-4">Сводка заказа</h2>
       
       <div className="space-y-3 mb-4 pb-4 border-b">
-        {orderCartsData?.orderCarts.map((item) => (
-          <div key={item.id} className="flex gap-3">
-            <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center text-3xl flex-shrink-0">
-              <img src={item.stock.product.photo ? `https://dataset.uz/${item.stock.product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"} alt={item.stock.product.brand.name} className="max-w-full max-h-full" />
+        {orderCartsData?.orderCarts.map((item) => {
+          const stock = item.stock;
+          const product = stock?.product;
+          // Create unique key using pk fields from query
+          const itemKey = `cart-${item.pk}-stock-${stock?.pk}`;
+          const imgSrc = product?.photo ? `https://dataset.uz/${product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image";
+          const altText = product?.brand?.name ?? product?.name ?? 'Товар';
+          const displayName = product?.name ?? 'Товар';
+          const sizeText = stock ? `${stock.size ?? ''}${stock.unit ?? ''}` : '';
+          const unitPrice = stock?.discount ?? stock?.cost ?? item.cost ?? 0;
+          const lineTotal = (unitPrice * (item.count ?? 0)).toFixed(2);
+          return (
+            <div key={itemKey} className="flex gap-3">
+              <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center text-3xl flex-shrink-0">
+                <img src={imgSrc} alt={altText} className="max-w-full max-h-full" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm">{displayName}</h3>
+                <p className="text-xs text-gray-600">{sizeText} × {item.count}</p>
+                <p className="font-bold text-gray-900 text-sm">{lineTotal} ₽</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 text-sm">{item.stock.product.name}</h3>
-              <p className="text-xs text-gray-600">{item.stock.size}{item.stock.unit} × {item.count}</p>
-              <p className="font-bold text-gray-900 text-sm">
-                {((item.stock.discount ?? item.stock.cost ?? item.cost) * item.count).toFixed(2)} ₽
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="space-y-2 mb-4 pb-4 border-b">
