@@ -11,9 +11,17 @@ import { useDeleteProduct } from '@/app/hooks/useProducts';
 import UpdateStockModal from './UpdateStockModal';
 import { importProducts } from '@/app/hooks/useImportProducts';
 
-const ProductsTable: React.FC = () => {
+type ProductsTableProps = {
+  /** Поиск из шапки админки — когда передан, локальное поле поиска не показывается */
+  searchTerm?: string;
+  onSearchTermChange?: (value: string) => void;
+};
+
+const ProductsTable: React.FC<ProductsTableProps> = ({ searchTerm: externalSearch, onSearchTermChange }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [internalSearch, setInternalSearch] = useState('');
+  const searchTerm = externalSearch !== undefined ? externalSearch : internalSearch;
+  const setSearchTerm = onSearchTermChange ?? setInternalSearch;
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateStockModalOpen, setIsUpdateStockModalOpen] = useState(false);
@@ -27,6 +35,11 @@ const ProductsTable: React.FC = () => {
   const { data: dataProductsCount, loading: loadingProductsCount, error: errorProductsCount } = useAdminProductsCount(searchTerm);
 
   const [deleteProduct] = useDeleteProduct();
+
+  // При смене поиска сбрасываем на первую страницу
+  React.useEffect(() => {
+    setCurrentPage(0);
+  }, [searchTerm]);
 
   const handleAddProduct = (productData: ProductFormData) => {
     console.log('New product:', productData);
@@ -112,18 +125,20 @@ const ProductsTable: React.FC = () => {
           </Button>
         </div>
         
-        {/* Filters */}
+        {/* Filters: поле поиска скрыто, когда поиск идёт из шапки (externalSearch) */}
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Поиск товаров..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 sm:pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm sm:text-base"
-            />
-          </div>
+          {externalSearch === undefined && (
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Найти парфюм"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 sm:pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm sm:text-base"
+              />
+            </div>
+          )}
           {/* <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}

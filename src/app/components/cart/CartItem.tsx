@@ -54,8 +54,8 @@ export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQu
       {/* Image */}
       <div className="bg-gray-100 rounded-lg w-full sm:w-20 md:w-24 h-32 sm:h-20 md:h-24 flex items-center justify-center flex-shrink-0 overflow-hidden">
         <img 
-          src={cart.product.photo ? `https://dataset.uz/${cart.product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"} 
-          alt={cart.product.brand.name} 
+          src={cart.product.photo?.imageUrl ? `https://dataset.uz/${cart.product.photo.imageUrl}` : "https://placehold.jp/3d4070/ffffff/150x150.png?text=No%20image"} 
+          alt={cart.product.brand?.name ?? cart.product.name ?? "Товар"} 
           className="w-full h-full object-cover" 
         />
       </div>
@@ -63,7 +63,7 @@ export const CartItem: React.FC<CartItemProps> = ({ cart, onSetStock, onUpdateQu
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex justify-between items-start mb-2 sm:mb-3 gap-2">
           <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">{cart.product.brand.name}</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">{cart.product.brand?.name ?? "—"}</p>
             <h3 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-2">{cart.product.name}</h3>
           </div>
           <button

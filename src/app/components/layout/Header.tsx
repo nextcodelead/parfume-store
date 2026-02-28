@@ -34,9 +34,12 @@ interface HeaderProps {
   activeTab?: 'cart' | 'wishlist';
   onTabChange?: (tab: 'cart' | 'wishlist') => void;
   onOpenFilters?: () => void;
+  /** Поиск на главной: значение и обработчик (когда переданы — поле управляемое) */
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters, searchValue, onSearchChange }) => {
   const { data, loading, error } = useMeMain();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false); // Состояние для меню категорий
@@ -68,6 +71,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onOpenFilters }
                 <input
                   type="text"
                   placeholder="Найти парфюм..."
+                  value={searchValue ?? ''}
+                  onChange={(e) => onSearchChange?.(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm"
                 />
                 <Search className="absolute right-4 top-2.5 text-gray-400" size={20} />

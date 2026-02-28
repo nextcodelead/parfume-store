@@ -67,11 +67,12 @@ export interface AdminProductsResponse {
 
 export const useAdminProducts = (name: string | null, page: number = 0) => {
   const isClient = useIsClient();
+  const searchName = typeof name === 'string' ? (name.trim() || null) : null;
   let filters = null;
-  if (name) {
+  if (searchName) {
     filters = {
       "name": {
-        "contains": name
+        "contains": searchName
       }
     };
   }
@@ -83,7 +84,7 @@ export const useAdminProducts = (name: string | null, page: number = 0) => {
         limit: 5,
       }
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     errorPolicy: 'all',
     skip: !isClient,
   });
@@ -96,11 +97,12 @@ export interface ProductsCountResponse {
 
 export const useAdminProductsCount = (name: string | null) => {
   const isClient = useIsClient();
+  const searchName = typeof name === 'string' ? (name.trim() || null) : null;
   let filters = null;
-  if (name) {
+  if (searchName) {
     filters = {
       "name": {
-        "contains": name
+        "contains": searchName
       }
     };
   }
@@ -108,7 +110,7 @@ export const useAdminProductsCount = (name: string | null) => {
     variables: { 
       filters: filters,
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     errorPolicy: 'all',
     skip: !isClient,
   });
