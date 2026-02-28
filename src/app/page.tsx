@@ -10,11 +10,12 @@ import { Search } from 'lucide-react';
 const filterBySearch = (products: Product[], query: string): Product[] => {
   const q = query.trim().toLowerCase();
   if (!q) return products;
-  return products.filter(
-    (p) =>
-      p.name?.toLowerCase().includes(q) ||
-      (p.brand as { name?: string } | undefined)?.name?.toLowerCase().includes(q)
-  );
+  return products.filter((p) => {
+    const nameMatch = p.name?.toLowerCase().includes(q);
+    const brandName = (p as Product & { brand?: { name?: string } }).brand?.name;
+    const brandMatch = brandName?.toLowerCase().includes(q);
+    return nameMatch || brandMatch;
+  });
 };
 
 const App: React.FC = () => {
